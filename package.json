@@ -1,0 +1,25 @@
+{
+  "name": "icosystem-cli",
+  "version": "0.0.1",
+  "description": "Command line tool for quickly building icon sets",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/geoctrl/icosystem-cli.git"
+  },
+  "author": "@geoctrl",
+  "license": "MIT",
+  "bin": {
+    "ico": "./index.js"
+  },
+  "bugs": {
+    "url": "https://github.com/geoctrl/icosystem-cli/issues"
+  },
+  "homepage": "https://github.com/geoctrl/icosystem-cli#readme",
+  "dependencies": {
+    "commander": "^2.9.0"
+  }
+}
