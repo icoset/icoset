@@ -1,0 +1,1 @@
+module.exports = ['icon1','icon2','icon3'];

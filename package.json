@@ -20,6 +20,8 @@
   },
   "homepage": "https://github.com/geoctrl/icosystem-cli#readme",
   "dependencies": {
-    "commander": "^2.9.0"
+    "cheerio": "^0.22.0",
+    "commander": "^2.9.0",
+    "htmlclean": "^3.0.2"
   }
 }
