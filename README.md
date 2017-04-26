@@ -1,6 +1,6 @@
 # Icosystem CLI
 
-Icosystem CLI is a utility that creates SVG `<symbol>`'s by you simply stating what icons you want to use.
+Icosystem CLI is a utility that creates SVG `<symbol>`'s by simply stating what icons you want to use.
 
 ## Icons
 
