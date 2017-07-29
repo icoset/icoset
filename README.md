@@ -27,9 +27,9 @@ Then in your terminal, run the `ico` command referencing your JSON:
 ico components/icons/icons.json
 ```
 
-The CLI generates a `svg-symbols.ts` file based off of your options, and places it in the same directory as your JSON (unless you specify otherwise with `--output`).
+The CLI generates a `svg-symbols.js` file based off of your options, and places it in the same directory as your JSON (unless you specify otherwise with `--output`).
 
-The `svg-symbols.ts` file would contain something similar to:
+The `svg-symbols.js` file would contain something similar to:
 
 ```typescript
 export const iconMap = {"magnify":true,"account":true}; // this is just a helper if you need it
@@ -52,7 +52,7 @@ All options are optional. Just pay mind to the defaults.
 | -----------------------|------------|----------------------|--------------------------|------------
 | --output               | -O         | Set output path      | -                        | -
 | --icon-family          | -I         | Set Icon Family Set  | `material`               | `material`
-| --file-type   :warning:| -T         | Set File type        | `ts`, `js`               | `ts`
+| --file-type   :warning:| -T         | Set File type        | `js`, `ts`               | `js`
 | --export-type :warning:| -E         | Set exporting syntax | `es6`, `commonjs`, `umd` | `es6`
 
 **:warning: Not implemented yet**

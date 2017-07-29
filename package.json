@@ -1,6 +1,6 @@
 {
   "name": "@geocompy/icosystem-cli",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Command line tool for quickly building icon sets",
   "main": "index.js",
   "scripts": {
@@ -23,6 +23,6 @@
     "cheerio": "^0.22.0",
     "commander": "^2.9.0",
     "htmlclean": "^3.0.2",
-    "mdi": "^1.9.33"
+    "mdi-svg": "^2.0.46"
   }
 }

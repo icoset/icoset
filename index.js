@@ -11,7 +11,7 @@ const cheerio = require('cheerio');
 let iconFamily = 'material',
     icons = [],
     outputPath,
-    fileType = 'ts',
+    fileType = 'js',
     filePath;
 
 // declare program
@@ -71,7 +71,11 @@ function buildFile(svg) {
 function buildIcons(iconFamily) {
   return new Promise((resolve, reject) => {
     let iconMap = icons.map(icon => {
-      let file = fs.readFileSync(path.resolve(__dirname, 'icons', iconFamily, `${icon}.svg`), 'utf8');
+      let file;
+      // handle all the other icons here
+      // using material for now
+      // /node_modules/mdi-svg/svg
+      file = fs.readFileSync(path.resolve(__dirname, 'node_modules', 'mdi-svg', 'svg', `${icon}.svg`), 'utf8');
       file = file.replace(/<\?xml(.*?)>|<!DOCTYPE(.*?)>|^ /g, '');
       file = file.replace(/svg/g, 'symbol');
       $ = cheerio.load(file, {
