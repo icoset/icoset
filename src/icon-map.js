@@ -1,6 +1,4 @@
 module.exports = {
-  material: [],
-  streamline: [],
-  ios: [],
-  weather: []
+  material: 'mdi',
+  weather: 'wi'
 };

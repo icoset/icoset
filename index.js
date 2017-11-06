@@ -2,7 +2,7 @@
 
 const fs = require('fs');
 const path = require('path');
-const iconMap = require('./src/icon-map');
+const iconMapPrepend = require('./src/icon-map');
 const iconTemplate = require('./src/icon-template');
 const program = require('commander');
 const htmlClean = require('htmlclean');
@@ -12,7 +12,8 @@ let iconFamily = 'material',
     icons = [],
     outputPath,
     fileType = 'js',
-    filePath;
+    filePath,
+    fileName;
 
 // declare program
 program
@@ -20,9 +21,10 @@ program
     .arguments('<file> [path]')
     .option(`-O, --output [output]`, `Set output path. Defaults to <file> location.`)
     .option(`-I, --icon-family [icon-family]`, `Declare an Icon Family. Defaults to 'material'.`)
-    .option(`-T, --file-type [file-type]`, `Declare file type (js or ts). Defaults to 'ts'.`)
+    .option(`-T, --file-type [file-type]`, `Declare file type (js or ts). Defaults to 'js'.`)
     .option(`-E, --export-type [export-type]`, `Declare module export syntax (umd, commonjs, es6). Defaults to 'es6'.`)
     .action(function(file) {
+      fileName = file;
       filePath = `/${path.relative('/', file)}`;
     })
     .parse(process.argv);
@@ -32,102 +34,188 @@ if (!filePath) {
 }
 
 // get things going
-getIconsFromFile(filePath)
-    .then(iconMap => {
+getIconsFromFile(filePath).then(
+    data => {
 
       let svgFolder = '';
+      let badDataError = `Can't seem to read the contents of ${fileName}`;
 
-      // figure out svg directory path
-      switch (program.iconFamily) {
-        case 'weather': // /weather-icons/svg
-          svgFolder = path.resolve(__dirname, 'node_modules', 'weather-icons', 'svg');
-          break;
-        case 'material': // /mdi-svg/svg
-        default:
-          svgFolder = path.resolve(__dirname, 'node_modules', 'mdi-svg', 'svg');
-          break;
+      outputPath = getOutputPath(program.output);
+
+      // data should be an object
+      if (typeof data !== 'object') throw Error(badDataError);
+
+      /** array of strings **/
+      if (data && data.length && typeof data[0] === 'string') {
+
+        // figure out svg directory path
+        switch (program.iconFamily) {
+          case 'weather': // /weather-icons/svg
+            svgFolder = path.resolve(__dirname, 'node_modules', 'weather-icons', 'svg');
+            break;
+          case 'material': // /mdi-svg/svg
+          default:
+            svgFolder = path.resolve(__dirname, 'node_modules', 'mdi-svg', 'svg');
+            break;
+        }
+
+        // use all icons in the svg directory
+        if (data && data.length === 1 && data[0] === '*') {
+          icons = fs.readdirSync(svgFolder, {encoding: 'utf8'}, function(err, filenames) {
+            if (err) {
+              throw Error(err);
+            }
+            return filenames;
+          });
+          icons = icons.map(icon => {
+            return icon.replace('.svg', '');
+          });
+          return buildIcons([{
+            family: setDefaultIconFamily(program.iconFamily),
+            directory: svgFolder,
+            icons: icons,
+            prepend: iconMapPrepend[setDefaultIconFamily(program.iconFamily)]
+          }]);
+        }
+
+        // use data
+        else if (data) {
+          outputPath = getOutputPath(program.output);
+          icons = data;
+          return buildIcons([{
+            family: setDefaultIconFamily(program.iconFamily),
+            directory: svgFolder,
+            icons: icons,
+            prepend: iconMapPrepend[setDefaultIconFamily(program.iconFamily)]
+          }]);
+        }
+
+        else {
+          return Promise.reject();
+        }
       }
 
-      // use all icons in the svg directory
-      if (iconMap && iconMap.length === 1 && iconMap[0] === '*') {
-        outputPath = getOutputPath(program.output);
-        icons = fs.readdirSync(svgFolder, {encoding: 'utf8'}, function(err, filenames) {
-          if (err) {
-            throw Error(err);
+      /** single config **/
+      // put it in an array and handle it like a collection
+      else if (data && data.icons) {
+        data = [data];
+      }
+
+      /** collection of configs **/
+      if (data && data.length) {
+        data.forEach(config => {
+          if (!config.directory) {
+            switch (config.family) {
+              case 'weather': // /weather-icons/svg
+                config.directory = path.resolve(__dirname, 'node_modules', 'weather-icons', 'svg');
+                break;
+              case 'material': // /mdi-svg/svg
+                config.directory = path.resolve(__dirname, 'node_modules', 'mdi-svg', 'svg');
+                break;
+            }
+          } else if (!config.prepend) {
+            config.prepend = 'custom';
           }
-          return filenames;
+
+          let iconSet;
+          if (config.icons && config.icons.length === 1 && config.icons[0] === '*') {
+            iconSet = fs.readdirSync(config.directory, {encoding: 'utf8'}, function (err, filenames) {
+              if (err) {
+                throw Error(err);
+              }
+              return filenames;
+            });
+            iconSet = iconSet.map(icon => {
+              return icon.replace('.svg', '');
+            });
+            config.icons = iconSet;
+          }
         });
-        icons = icons.map(icon => {
-          return icon.replace('.svg', '');
-        });
-        return buildIcons(setDefaultIconFamily(program.iconFamily), svgFolder);
+        return buildIcons(data);
+
+      } else {
+        throw Error(badDataError)
       }
 
-      // use iconMap
-      else if (iconMap) {
-        outputPath = getOutputPath(program.output);
-        icons = iconMap;
-        return buildIcons(setDefaultIconFamily(program.iconFamily), svgFolder);
-      }
-
-      else {
-        return Promise.reject();
-      }
-    })
-    .then(svg => {
-      buildFile(svg);
-      console.log('Success!');
-      // return buildIcons(res)
-    })
-    .catch(err => console.error(err));
+    }).then(
+        svg => {
+          buildFile(svg);
+          console.log('Success!');
+          // return buildIcons(res)
+        }).catch(err => console.error(err));
 
 
 function buildFile(svg) {
   return new Promise((resolve, reject) => {
     // add the svg and iconMap into the template
-    let template = iconTemplate.replace(/__svgSymbols__/g, svg);
-    template = template.replace(/__iconMap__/, JSON.stringify(
-        icons.reduce((acc, cur) => {
-          acc[cur] = true;
-          return acc;
-        }, {})
-    ));
+    let template = iconTemplate.replace(/__svgSymbols__/g, svg.join(''));
+    // todo: maybe we can make the icon map an opt-in feature?
+    // template = template.replace(/__iconMap__/, JSON.stringify(
+    //     icons.reduce((acc, cur) => {
+    //       acc[cur] = true;
+    //       return acc;
+    //     }, {})
+    // ));
     fs.writeFile(outputPath, template, err => {
       if (err) throw err;
     });
   });
 }
 
-function buildIcons(iconFamily, svgFolder) {
-  return new Promise((resolve, reject) => {
-    let iconMap = icons.map(icon => {
-      let file;
-      file = fs.readFileSync(path.resolve(svgFolder, `${icon}.svg`), 'utf8');
-      file = file.replace(/<\?xml(.*?)>|<!DOCTYPE(.*?)>|^ /g, '');
-      file = file.replace(/svg/g, 'symbol');
-      $ = cheerio.load(file, {
-        normalizeWhitespace: true,
-        decodeEntities: false
+function buildIcons(configs) {
+  return Promise.all(configs.map(config => {
+    return new Promise((resolve, reject) => {
+      let iconMap = config.icons.map(icon => {
+        let file;
+        file = fs.readFileSync(path.resolve(config.directory, `${icon}.svg`), 'utf8');
+        // remove common svg nonsense
+        file = file.replace(/<\?xml(.*?)>|<!DOCTYPE(.*?)>|^ /g, '');
+        file = file.replace(/<style(.*?)>*<\/style>/g, '');
+        file = file.replace(/svg/g, 'symbol');
+        $ = cheerio.load(file, {
+          normalizeWhitespace: true,
+          decodeEntities: false
+        });
+        // remove all fills / styles
+        $('[fill]').removeAttr('fill');
+        $('[style]').removeAttr('style');
+        let symbol = $('symbol');
+        // remove all symbol attributes
+        symbol[0].attribs = {};
+
+        // handle prepended name
+        let iconName = icon;
+        if (config.prepend) {
+          // remove weather's 'wi-' prepended name
+          if (config.family === 'weather') {
+            iconName = icon.replace('wi-', `${config.prepend}-`);
+          } else {
+            iconName = `${config.prepend}-${iconName}`
+          }
+        }
+
+        symbol.attr('id', iconName);
+        return $.html();
       });
-      // remove all fills
-      $('[fill]').removeAttr('fill');
-      let symbol = $('symbol');
-      // remove all symbol attributes
-      symbol[0].attribs = {};
-      symbol.attr('id', icon);
-      return $.html();
+      // wrap symbols in svg
+      let svg = `<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">${iconMap.join('')}</svg>`;
+      resolve(htmlClean(svg));
     });
-    // wrap symbols in svg
-    let svg = `<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">${iconMap.join('')}</svg>`;
-    resolve(htmlClean(svg));
-  });
+  }));
 }
 
 
+/**
+ * Get Icons From File
+ * @param filePath
+ * @return {Promise}
+ */
 function getIconsFromFile(filePath) {
   return new Promise((resolve, reject) => {
     let ext = filePath.slice(filePath.lastIndexOf('.')+1);
-    if (ext == 'json') {
+
+    // read json file
+    if (ext === 'json') {
       fs.readFile(filePath, 'utf8', (err, data) => {
         if (err) {
           console.error(`Could not open "${filePath}". Process stopped because of Error.`, err);
@@ -136,25 +224,35 @@ function getIconsFromFile(filePath) {
           resolve(JSON.parse(data));
         }
       });
-    } else {
+    }
+
+    // require module
+    else if (ext === 'js') {
+      resolve(require(filePath));
+    }
+
+    // got nothing
+    else {
       console.error(`Error: <file> must be a valid JSON array`);
     }
-  }).catch(err => console.error(err));
+  }).catch(err => {
+    throw Error(err);
+  });
 }
 
 function setDefaultIconFamily(iconFamilyInput) {
   let returnIconFamily = 'material';
   if (iconFamilyInput) {
-    if (iconMap[iconFamilyInput]) {
+    if (iconMapPrepend[iconFamilyInput]) {
       returnIconFamily = iconFamilyInput;
     } else {
       console.error(`
         "${iconFamilyInput}" is not a valid icon family. Defaulting to "material".`,
-          `Available Icon families: ${Object.keys(iconMap).join(', ')}.`
+          `Available Icon families: ${Object.keys(iconMapPrepend).join(', ')}.`
       );
     }
   }
-  return returnIconFamily;
+  return iconFamilyInput = returnIconFamily;
 }
 
 function getOutputPath(output) {

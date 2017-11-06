@@ -2,7 +2,14 @@
 
 Icosystem CLI is a utility that creates SVG `<symbol>`'s by simply stating what icons you want to use.
 
-## NEW!
+### New! Use custom icons and advanced configs - v0.2.0
+
+- Use local icon sets to build your symbol file.
+- The config can now be a node module `.js` file.
+- The config can now handle different structures (array of icons, config object, collection of config objects).
+- The new config functionality is backward compatible with `<= v0.1.2`.
+
+### Weather Icons v0.1.2
 
 [Weather Icons](https://github.com/erikflowers/weather-icons/) are now available! Set your icon family option as `weather` to use it:
 
@@ -23,36 +30,96 @@ npm install -g @geocompy/icosystem-cli
 
 ## Use
 
-In your project, create a JSON file (eg: `components/icons/icons.json`), then add a single array with all the icons you need for your app. [Make sure the icons exist](https://github.com/geoctrl/icosystem-cli/tree/master/icons) or else the command will fail (Use the icon file names in your JSON).
+In your project, create a node module `.js` or `JSON` file (eg: `components/icons/icons.js`), then add a single array with all the icons you need for your app. The name of the icon is the name of the svg file without the `.svg` extension:
 
 ```javascript
-["magnify","account"]
+module.exports = ["magnify","account"];
 ```
 
-Then in your terminal, run the `ico` command referencing your JSON:
+Then in your terminal, run the `ico` command referencing your config file:
 
 ```bash
-$ ico path-to-json/icons.json
+$ ico path-to-json/icons.js
 ```
 
-The CLI generates a `svg-symbols.js` file based off of your options, and places it in the same directory as your JSON (unless you specify otherwise with `--output`).
+The CLI generates a `svg-symbols.js` file based off of your options, and places it in the same directory as your config file (unless you specify otherwise with `--output`).
 
 The `svg-symbols.js` file would contain something similar to:
 
 ```typescript
-export const iconMap = {"magnify":true,"account":true}; // this is just a helper if you need it
 export const svgSymbols = `<svg xmlns="http://www.w3.org/2000/svg" style="display: none;"><symbol id="magnify">...</symbol><symbol id="account">...</symbol></svg>`;
 ```
 
-Easily import your SVG `import { svgSymbols } from './svg-symbols';` and place it in the root of your application. See my [Angular Svg Icons](https://github.com/geoctrl/angular-svg-icons) component for an example on how to consume it.
+Easily import your SVG and place it in the root of your application:
 
-*NOTE:* You can also create a JSON file with a single item `["*"]` - this will add ALL icons from the selected pack.
+```javascript
+import { svgSymbols } from './svg-symbols';
+let template = `<div>${svgSymbols}</div>`;
+```
 
-## Arguments
+## Advanced Config
+
+Typing arguments in the CLI every time can be redundant - luckily, we can remedy this by restructuring the config file.
+
+Excluding the simple array example shown above, you can structure your config in two ways:
+
+```javascript
+// single config
+module.exports = {
+  family: 'material',
+  icons: ['account', 'magnify']
+};
+ 
+// collection of configs
+module.exports = [
+    {
+      family: 'weather',
+      icons: ['*']
+    },
+    {
+      family: 'material',
+      icons: ['account', 'magnify']
+    }
+];
+```
+
+By creating a collection, you can import multiple icon sets into your project!
+
+### Select all icons in a set
+
+Select all icons in a set by putting a single `*` in your icon array:
+
+```javascript
+// single config
+module.exports = {
+  family: 'weather',
+  icons: ['*']
+};
+```
+
+### Custom icon sets
+
+Sometimes, you'll need to add an icon set that's not open source (or just not available yet in the CLI).
+You can add it by adding a `directory` prop to your config:
+
+```javascript
+module.exports = {
+  family: 'font-awesome-pro',
+  prepend: 'fa',
+  directory: 'relative/path/to/icons',
+  icons: ['bars']
+}
+```
+
+**Directory Caveat:** The CLI assumes this `directory` is a folder containing ALL of your SVG's for the icon set.
+It does not dig through sub-folders (but maybe it should?).
+
+
+## CLI Arguments
 
 #### JSON File
 
-Path to your json file for CLI to consume
+Path to your config file.
 
 ## Options
 
@@ -67,8 +134,12 @@ All options are optional. Just pay mind to the defaults.
 
 **:warning: Not implemented yet**
 
+
+
 ## Roadmap
 
+- ~~Add a config so you can change the defaults~~ **v0.2.0**
 - Add more open source icon families (Streamline free, Feather, etc) Might even add attribution icons as well - [The Noun Project](http://thenounproject.com) is full of them...
-- Add a config so you can change the defaults
-- Input is appreciated! I'm open to ideas and would love to collaborate to make this an awesome project.
+- Add some tests.
+
+Input is appreciated! I'm open to ideas and would love to collaborate to make this an awesome project.
