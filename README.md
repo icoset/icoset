@@ -2,9 +2,17 @@
 
 Icosystem CLI is a utility that creates SVG `<symbol>`'s by simply stating what icons you want to use.
 
+## NEW!
+
+[Weather Icons](https://github.com/erikflowers/weather-icons/) are now available! Set your icon family option as `weather` to use it:
+
+```bash
+$ ico -I weather path-to-json/icons.json
+```
+
 ## Icons
 
-This repo houses open source icons so it can generate SVG's. Currently, only [Material Icons](https://materialdesignicons.com/) are available.
+This repo depends on open source icons so it can generate SVG's. Currently, only [Material Design Icons](https://materialdesignicons.com/) and [weather-icons](https://github.com/erikflowers/weather-icons/) are available.
 
 **More coming soon.**
 
@@ -24,7 +32,7 @@ In your project, create a JSON file (eg: `components/icons/icons.json`), then ad
 Then in your terminal, run the `ico` command referencing your JSON:
 
 ```bash
-ico components/icons/icons.json
+$ ico path-to-json/icons.json
 ```
 
 The CLI generates a `svg-symbols.js` file based off of your options, and places it in the same directory as your JSON (unless you specify otherwise with `--output`).
@@ -35,6 +43,8 @@ The `svg-symbols.js` file would contain something similar to:
 export const iconMap = {"magnify":true,"account":true}; // this is just a helper if you need it
 export const svgSymbols = `<svg xmlns="http://www.w3.org/2000/svg" style="display: none;"><symbol id="magnify">...</symbol><symbol id="account">...</symbol></svg>`;
 ```
+
+*NOTE:* You can also create a JSON file with a single item `["*"]` - this will add ALL icons from the selected pack.
 
 Easily import your SVG `import { svgSymbols } from './svg-symbols';` and place it in the root of your application. See my [Angular Svg Icons](https://github.com/geoctrl/angular-svg-icons) component for an example on how to consume it.
 
@@ -51,7 +61,7 @@ All options are optional. Just pay mind to the defaults.
 | Flag                   | Short Flag | Description          | Options                  | Defaults
 | -----------------------|------------|----------------------|--------------------------|------------
 | --output               | -O         | Set output path      | -                        | -
-| --icon-family          | -I         | Set Icon Family Set  | `material`               | `material`
+| --icon-family          | -I         | Set Icon Family Set  | `material`, `weather`    | `material`
 | --file-type   :warning:| -T         | Set File type        | `js`, `ts`               | `js`
 | --export-type :warning:| -E         | Set exporting syntax | `es6`, `commonjs`, `umd` | `es6`
 
