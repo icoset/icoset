@@ -44,9 +44,9 @@ export const iconMap = {"magnify":true,"account":true}; // this is just a helper
 export const svgSymbols = `<svg xmlns="http://www.w3.org/2000/svg" style="display: none;"><symbol id="magnify">...</symbol><symbol id="account">...</symbol></svg>`;
 ```
 
-*NOTE:* You can also create a JSON file with a single item `["*"]` - this will add ALL icons from the selected pack.
-
 Easily import your SVG `import { svgSymbols } from './svg-symbols';` and place it in the root of your application. See my [Angular Svg Icons](https://github.com/geoctrl/angular-svg-icons) component for an example on how to consume it.
+
+*NOTE:* You can also create a JSON file with a single item `["*"]` - this will add ALL icons from the selected pack.
 
 ## Arguments
 
