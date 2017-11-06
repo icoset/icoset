@@ -1,5 +1,6 @@
 module.exports = {
   material: [],
   streamline: [],
-  ios: []
+  ios: [],
+  weather: []
 };

@@ -34,20 +34,50 @@ if (!filePath) {
 // get things going
 getIconsFromFile(filePath)
     .then(iconMap => {
-      if (iconMap) {
+
+      let svgFolder = '';
+
+      // figure out svg directory path
+      switch (program.iconFamily) {
+        case 'weather': // /weather-icons/svg
+          svgFolder = path.resolve(__dirname, 'node_modules', 'weather-icons', 'svg');
+          break;
+        case 'material': // /mdi-svg/svg
+        default:
+          svgFolder = path.resolve(__dirname, 'node_modules', 'mdi-svg', 'svg');
+          break;
+      }
+
+      // use all icons in the svg directory
+      if (iconMap && iconMap.length === 1 && iconMap[0] === '*') {
+        outputPath = getOutputPath(program.output);
+        icons = fs.readdirSync(svgFolder, {encoding: 'utf8'}, function(err, filenames) {
+          if (err) {
+            throw Error(err);
+          }
+          return filenames;
+        });
+        icons = icons.map(icon => {
+          return icon.replace('.svg', '');
+        });
+        return buildIcons(setDefaultIconFamily(program.iconFamily), svgFolder);
+      }
+
+      // use iconMap
+      else if (iconMap) {
         outputPath = getOutputPath(program.output);
         icons = iconMap;
-        return buildIcons(setDefaultIconFamily(program.iconFamily));
-      } else {
+        return buildIcons(setDefaultIconFamily(program.iconFamily), svgFolder);
+      }
+
+      else {
         return Promise.reject();
       }
     })
     .then(svg => {
       buildFile(svg);
+      console.log('Success!');
       // return buildIcons(res)
-    })
-    .then(res => {
-      // console.log(res);
     })
     .catch(err => console.error(err));
 
@@ -68,14 +98,11 @@ function buildFile(svg) {
   });
 }
 
-function buildIcons(iconFamily) {
+function buildIcons(iconFamily, svgFolder) {
   return new Promise((resolve, reject) => {
     let iconMap = icons.map(icon => {
       let file;
-      // handle all the other icons here
-      // using material for now
-      // /node_modules/mdi-svg/svg
-      file = fs.readFileSync(path.resolve(__dirname, 'node_modules', 'mdi-svg', 'svg', `${icon}.svg`), 'utf8');
+      file = fs.readFileSync(path.resolve(svgFolder, `${icon}.svg`), 'utf8');
       file = file.replace(/<\?xml(.*?)>|<!DOCTYPE(.*?)>|^ /g, '');
       file = file.replace(/svg/g, 'symbol');
       $ = cheerio.load(file, {
