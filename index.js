@@ -180,8 +180,12 @@ function buildIcons(configs) {
         $('[fill]').removeAttr('fill');
         $('[style]').removeAttr('style');
         let symbol = $('symbol');
-        // remove all symbol attributes
+        // remove all symbol attributes except viewBox
+        let viewBox = symbol[0].attribs.viewbox;
         symbol[0].attribs = {};
+        if (viewBox) {
+          symbol[0].attribs.viewbox = viewBox;
+        }
 
         // handle prepended name
         let iconName = icon;
