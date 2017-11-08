@@ -111,6 +111,25 @@ module.exports = {
 }
 ```
 
+### Icon Map
+
+With the `.map` option set to `true`, the CLI builds an object for every icon in the set, allowing for icon checks. Also, each icon in the map has a `viewBox` property in case you need it (helpful when using a variable-width icon set).
+
+```javascript
+module.exports = {
+  family: 'weather',
+  icons: ['*'],
+  map: true
+}
+```
+
+The map is accessible in the same `svg-symbols.js` file, under `iconMap`:
+
+```javascript
+import { iconMap } from './svg-symbols';
+```
+
+
 **Directory Caveat:** The CLI assumes this `directory` is a folder containing ALL of your SVG's for the icon set.
 It does not dig through sub-folders (but maybe it should?).
 
