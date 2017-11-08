@@ -150,7 +150,7 @@ function buildFile(svg) {
   return new Promise((resolve, reject) => {
     // add the svg and iconMap into the template
     let template = iconTemplate.replace(/__svgSymbols__/g, svg.join(''));
-    if (Object.keys(outputMap).length === 0 && outputMap.constructor === Object) {
+    if (Object.keys(outputMap).length > 0 && outputMap.constructor === Object) {
       template = template.replace(/__iconMap__/, JSON.stringify(outputMap));
     }
     fs.writeFile(outputPath, template, err => {
