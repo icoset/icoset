@@ -10,6 +10,7 @@ const cheerio = require('cheerio');
 
 let iconFamily = 'material',
     icons = [],
+    outputMap = {},
     outputPath,
     fileType = 'js',
     filePath,
@@ -149,13 +150,9 @@ function buildFile(svg) {
   return new Promise((resolve, reject) => {
     // add the svg and iconMap into the template
     let template = iconTemplate.replace(/__svgSymbols__/g, svg.join(''));
-    // todo: maybe we can make the icon map an opt-in feature?
-    // template = template.replace(/__iconMap__/, JSON.stringify(
-    //     icons.reduce((acc, cur) => {
-    //       acc[cur] = true;
-    //       return acc;
-    //     }, {})
-    // ));
+    if (Object.keys(outputMap).length === 0 && outputMap.constructor === Object) {
+      template = template.replace(/__iconMap__/, JSON.stringify(outputMap));
+    }
     fs.writeFile(outputPath, template, err => {
       if (err) throw err;
     });
@@ -185,6 +182,10 @@ function buildIcons(configs) {
         symbol[0].attribs = {};
         if (viewBox) {
           symbol[0].attribs.viewbox = viewBox;
+        }
+
+        if (config.map) {
+          outputMap[icon] = { viewBox };
         }
 
         // handle prepended name
