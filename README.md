@@ -132,6 +132,21 @@ The map is accessible in the same `svg-symbols.js` file, under `iconMap`:
 import { iconMap } from './svg-symbols';
 ```
 
+### Prepend icon names
+
+Especially when using multiple icon sets, it makes sense prepend a unique identifier so we don't override names. Do this by adding a `.prepend` option to the config:
+
+```javascript
+module.exports = {
+  family: 'font-awesome-pro',
+  prepend: 'fa',
+  directory: 'relative/path/to/icons',
+  icons: ['bars']
+}
+```
+
+By default, `weather-icons` come with with a prepended name: `wi-`. By changing the prepend prop, you can override it (so yes, `weather-icons` will always have a prepended name).
+
 ## CLI Arguments
 
 #### JSON File
