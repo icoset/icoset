@@ -1,6 +1,6 @@
 {
   "name": "@geocompy/icosystem-cli",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "description": "Command line tool for quickly building icon sets",
   "main": "index.js",
   "scripts": {

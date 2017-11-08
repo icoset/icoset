@@ -184,10 +184,6 @@ function buildIcons(configs) {
           symbol[0].attribs.viewbox = viewBox;
         }
 
-        if (config.map) {
-          outputMap[icon] = { viewBox };
-        }
-
         // handle prepended name
         let iconName = icon;
         if (config.prepend) {
@@ -197,6 +193,10 @@ function buildIcons(configs) {
           } else {
             iconName = `${config.prepend}-${iconName}`
           }
+        }
+
+        if (config.map) {
+          outputMap[iconName] = { viewBox };
         }
 
         symbol.attr('id', iconName);
