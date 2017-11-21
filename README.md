@@ -7,7 +7,7 @@ Icosystem CLI is a utility that creates SVG `<symbol>`'s by simply stating what 
 - Use local icon sets to build your symbol file.
 - The config can now be a node module `.js` file.
 - The config can now handle different structures (array of icons, config object, collection of config objects).
-- The new config functionality is backward compatible with `<= v0.1.2`.
+- The new config functionality is backward compatible with all previous versions.
 
 ### Weather Icons v0.1.2
 
