@@ -17,7 +17,7 @@ let outputPath,
     outputMap = {},
     outputFileName = 'icon-symbols.js',
     defaultOptions = {
-      family: 'material',
+      family: 'mdi',
       directory: '',
       map: true,
       prepend: false,
@@ -49,7 +49,6 @@ runProgram()
       console.log(`[ico Error] ${err}`.red);
       rl.close();
     });
-
 
 /**
  * Run Program
@@ -100,7 +99,6 @@ function runProgram() {
   });
 }
 
-
 /**
  * Get File
  * get file depending on extension
@@ -125,7 +123,6 @@ function getFile() {
     }
   });
 }
-
 
 /**
  * Construct Data
@@ -164,7 +161,7 @@ function constructData(data) {
             case 'weather': // /weather-icons/svg
               currentConfig.directory = path.resolve(__dirname, 'node_modules', 'weather-icons', 'svg');
               break;
-            case 'material': // /mdi-svg/svg
+            case 'mdi': // /mdi-svg/svg
               currentConfig.directory = path.resolve(__dirname, 'node_modules', 'mdi-svg', 'svg');
               break;
           }
@@ -191,7 +188,6 @@ function constructData(data) {
     }
   });
 }
-
 
 /**
  * Build Icons
