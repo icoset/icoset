@@ -19,16 +19,6 @@ module.exports = {
   family: 'mdi',
   icons: ['magnify', 'help']
 }
-module.exports = [
-  {
-    family: 'mdi',
-    icons: ['magnify', 'help']
-  },
-  {
-    family: 'weather',
-    icons: ['cloudy']
-  }
-]
 ```
 
 #### Removal of CLI options
