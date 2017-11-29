@@ -2,90 +2,126 @@
 
 Icosystem CLI is a utility that creates SVG `<symbol>`'s by simply stating what icons you want to use.
 
-### New! Use custom icons and advanced configs - v0.2.0
+### v0.3.0 - Breaking changes
 
-- Use local icon sets to build your symbol file.
-- The config can now be a node module `.js` file.
-- The config can now handle different structures (array of icons, config object, collection of config objects).
-- The new config functionality is backward compatible with all previous versions.
+#### Configuration Requirements
 
-### Weather Icons v0.1.2
+Icon config files now require `family` and `icons` props, which means simple icon arrays are not valid anymore:
 
-[Weather Icons](https://github.com/erikflowers/weather-icons/) are now available! Set your icon family option as `weather` to use it:
-
-```bash
-$ ico -I weather path-to-json/icons.json
+```javascript
+// not valid
+module.exports = ['magnify', 'help']
 ```
+
+```javascript
+// valid
+module.exports = {
+  family: 'mdi',
+  icons: ['magnify', 'help']
+}
+module.exports = [
+  {
+    family: 'mdi',
+    icons: ['magnify', 'help']
+  },
+  {
+    family: 'weather',
+    icons: ['cloudy']
+  }
+]
+```
+
+#### Removal of CLI options
+
+Writing out multiple options every time you needed to add an icon is redundant - and since we're already writing a config for our `icons` list, it just makes sense to require `family` as well, and remove most of the CLI options.
+
+CLI options being removed:
+
+- `--icon-family` (now `family` prop in config)
+- `--file-type` (only supporting js files for now)
+- `--export-type` (only supporting es6 modules for now)
+
+#### Output file rename
+
+Changed the output file's name from `svg-symbols.js` to `icon-symbols.js`.
+
+#### Technical Things
+
+I did a complete overhaul of the build process (even reduced the code footprint a bit :smile:):
+
+- Code is clearly formed in a pipeline
+- Self documented with some JSDocs
+- cleaned up some global messiness
+- Added more (clearer) error messages
+
+---
 
 ## Icons
 
-This repo depends on open source icons so it can generate SVG's. Currently, only [Material Design Icons](https://materialdesignicons.com/) and [weather-icons](https://github.com/erikflowers/weather-icons/) are available.
+This repo depends on open source SVG icon sets. Icons sets available:
 
-**More coming soon.**
+- [Material Design Icons](https://materialdesignicons.com/) (family = `mdi)
+- [weather-icons](https://github.com/erikflowers/weather-icons/)
+- **More coming soon.**
+
+You can also use local icon sets - see [Custom Icon Sets](#custom-icon-sets) to learn more.
 
 ## Install
 ```bash
 npm install -g @geocompy/icosystem-cli
 ```
 
-## Use
+## Configuration
 
-In your project, create a node module `.js` or `JSON` file (eg: `components/icons/icons.js`), then add a single array with all the icons you need for your app. The name of the icon is the name of the svg file without the `.svg` extension:
-
-```javascript
-module.exports = ["magnify","account"];
-```
-
-Then in your terminal, run the `ico` command referencing your config file:
-
-```bash
-$ ico path-to-json/icons.js
-```
-
-The CLI generates a `svg-symbols.js` file based off of your options, and places it in the same directory as your config file (unless you specify otherwise with `--output`).
-
-The `svg-symbols.js` file would contain something similar to:
-
-```typescript
-export const svgSymbols = `<svg xmlns="http://www.w3.org/2000/svg" style="display: none;"><symbol id="magnify">...</symbol><symbol id="account">...</symbol></svg>`;
-```
-
-Easily import your SVG and place it in the root of your application:
+The CLI requires a config file that tells it how to retrieve icons and how to process them. The minimum requirements to writing a config are the props `family` and `icons`.
 
 ```javascript
-import { svgSymbols } from './svg-symbols';
-let template = `<div>${svgSymbols}</div>`;
-```
-
-## Advanced Config
-
-Typing arguments in the CLI every time can be redundant - luckily, we can remedy this by restructuring the config file.
-
-Excluding the simple array example shown above, you can structure your config in two ways:
-
-```javascript
-// single config
 module.exports = {
   family: 'material',
   icons: ['account', 'magnify']
 };
- 
+```
+
+### Use
+
+Run the CLI and target your file:
+
+```bash
+$ ico path/to/config-file.js
+```
+
+The CLI generates a new file called `icon-symbols.js` that contains your specified icon sets:
+
+```javascript
+import { icons } from './icon-symbols.js'
+let rootTemplate = `<div>${icons}</div>`
+```
+
+### Options
+
+#### Multiple Icon Sets
+
+You can add multiple icon sets by creating a collection of configs:
+
+```javascript
 // collection of configs
 module.exports = [
     {
       family: 'weather',
-      icons: ['*']
+      icons: ['cloudy'],
+      prepend: 'wi'
     },
     {
       family: 'material',
-      icons: ['account', 'magnify']
+      icons: ['account', 'magnify'],
+      prepend: 'mid'
     }
 ];
 ```
 
-By creating a collection, you can import multiple icon sets into your project!
+To avoid name collisions between icon sets, the `prepend` prop is required, which will prepend all icon names id's and mappings. See [Prepend icon names](#prepend-icon-names) to learn more.
 
-### Select all icons in a set
+#### Select all icons in a set
 
 Select all icons in a set by putting a single `*` in your icon array:
 
@@ -97,7 +133,7 @@ module.exports = {
 };
 ```
 
-### Custom icon sets
+#### Custom icon sets
 
 Sometimes, you'll need to add an icon set that's not open source (or just not available yet in the CLI).
 You can add it by adding a `directory` prop to your config:
@@ -105,8 +141,7 @@ You can add it by adding a `directory` prop to your config:
 ```javascript
 module.exports = {
   family: 'font-awesome-pro',
-  prepend: 'fa',
-  directory: 'relative/path/to/icons',
+  directory: 'path/to/icons',
   icons: ['bars']
 }
 ```
@@ -114,27 +149,29 @@ module.exports = {
 **Directory Caveat:** The CLI assumes this `directory` is a folder containing ALL of your SVG's for the icon set.
 It does not dig through sub-folders (but maybe it should?).
 
-### Icon Map
+#### Icon Map
 
-With the `.map` option set to `true`, the CLI builds an object for every icon in the set, allowing for icon checks. Also, each icon in the map has a `viewBox` property in case you need it (helpful when using a variable-width icon set).
+The CLI generates a map of every icon being passed in. This could be helpful to programatically check if icons are available, generating lists, etc. Each icon in the map has a `viewBox` property in case you need it (helpful when using a variable-width icon set).
+
+This option is `true` by default, but you can turn it off as well:
 
 ```javascript
 module.exports = {
   family: 'weather',
   icons: ['*'],
-  map: true
+  map: false
 }
 ```
 
-The map is accessible in the same `svg-symbols.js` file, under `iconMap`:
+The map is accessible in the same `icon-symbols.js` file, under `iconMap`:
 
 ```javascript
-import { iconMap } from './svg-symbols';
+import { iconMap } from './icon-symbols';
 ```
 
 ### Prepend icon names
 
-Especially when using multiple icon sets, it makes sense prepend a unique identifier so we don't override names. Do this by adding a `.prepend` option to the config:
+Prepend icon names with another name:
 
 ```javascript
 module.exports = {
@@ -143,30 +180,40 @@ module.exports = {
   directory: 'relative/path/to/icons',
   icons: ['bars']
 }
+
+// the "bar" icon will look like:
+// id="fa-bars"
 ```
 
-By default, `weather-icons` come with with a prepended name: `wi-`. By changing the prepend prop, you can override it (so yes, `weather-icons` will always have a prepended name).
+**NOTES**
+
+- When adding multiple icon sets to your config, the `prepend` prop is required to avoid name collisions.
+- The `weather` icon set SVG's comes with a prepended name `wi-`. We actually remove this to allow for customizability with prepended names.
+
 
 ## CLI Arguments
 
-#### JSON File
+#### Required Argument: `<File>` (Icon config)
 
 Path to your config file.
 
 ## Options
 
-All options are optional. Just pay mind to the defaults.
-
-| Flag                   | Short Flag | Description          | Options                  | Defaults
-| -----------------------|------------|----------------------|--------------------------|------------
-| --output               | -O         | Set output path      | -                        | -
-| --icon-family          | -I         | Set Icon Family Set  | `material`, `weather`    | `material`
-| --file-type   :warning:| -T         | Set File type        | `js`, `ts`               | `js`
-| --export-type :warning:| -E         | Set exporting syntax | `es6`, `commonjs`, `umd` | `es6`
-
-**:warning: Not implemented yet**
+| Flag                   | Short Flag | Description          
+| -----------------------|------------|-----------------
+| --output               | -O         | Set output path
 
 
+## Weather Icon Note
+
+If you go to the [weather-icons site](http://erikflowers.github.io/weather-icons/) you'll notice that each icon is prepended with `wi-`. This prepended name is not required when adding icons (in fact, if you add `wi-` on the name, it won't be able to find the icon):
+
+```javascript
+module.exports = {
+  family: 'weather',
+  icons: ['cloudy'] // we'll grab wi-cloudy
+}
+```
 
 ## Roadmap
 
