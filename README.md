@@ -16,7 +16,7 @@ module.exports = ['magnify', 'help']
 ```javascript
 // valid
 module.exports = {
-  family: 'mdi',
+  family: 'material',
   icons: ['magnify', 'help']
 }
 ```
@@ -50,7 +50,7 @@ I did a complete overhaul of the build process (even reduced the code footprint 
 
 This repo depends on open source SVG icon sets. Icons available:
 
-- [Material Design Icons](https://materialdesignicons.com/) (family = `mdi`)
+- [Material Design Icons](https://materialdesignicons.com/) (family = `material`)
 - [weather-icons](https://github.com/erikflowers/weather-icons/) (family = `weather`)
 - **More coming soon.**
 
@@ -67,7 +67,7 @@ The CLI requires a config file that tells it how to retrieve icons and how to pr
 
 ```javascript
 module.exports = {
-  family: 'mdi',
+  family: 'material',
   icons: ['account', 'magnify']
 };
 ```
@@ -102,7 +102,7 @@ module.exports = [
       prepend: 'wi'
     },
     {
-      family: 'mdi',
+      family: 'material',
       icons: ['account', 'magnify'],
       prepend: 'mdi'
     }

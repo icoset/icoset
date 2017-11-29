@@ -9,6 +9,7 @@ const cheerio = require('cheerio');
 require('colors');
 
 const iconTemplate = require('./src/icon-template');
+const iconFamilyMap = require('./src/icon-family-map');
 
 let outputPath,
     filePath,
@@ -17,7 +18,7 @@ let outputPath,
     outputMap = {},
     outputFileName = 'icon-symbols.js',
     defaultOptions = {
-      family: 'mdi',
+      family: 'material',
       directory: '',
       map: true,
       prepend: false,
@@ -68,13 +69,9 @@ function runProgram() {
           let filePathParsed = path.parse(filePath);
 
           // extension
-          if (file.lastIndexOf('.') > -1) {
-            extension = file.slice(file.lastIndexOf('.')+1);
+          if (filePathParsed.ext === '.js' || filePathParsed.ext === '.json') {
+            extension = filePathParsed.ext;
           } else {
-            reject(`<file> must be a JSON or JS file`);
-            return;
-          }
-          if (extension !== 'js' && extension !== 'json') {
             reject(`<file> must be a JSON or JS file`);
             return;
           }
@@ -105,9 +102,13 @@ function runProgram() {
  * @return {Promise} resolves the file contents
  */
 function getFile() {
+  readline.clearLine(process.stdout, 0);
+  readline.cursorTo(process.stdout, 0, null);
+  rl.write('Getting File...');
+
   return new Promise((resolve, reject) => {
     // read json file
-    if (extension === 'json') {
+    if (extension === '.json') {
       fs.readFile(filePath, 'utf8', (err, data) => {
         if (err) {
           reject(`Could not open "${filePath}".`, err);
@@ -118,7 +119,7 @@ function getFile() {
     }
 
     // require module
-    else if (extension === 'js') {
+    else if (extension === '.js') {
       resolve(require(filePath));
     }
   });
@@ -131,6 +132,10 @@ function getFile() {
  * @return {Promise}
  */
 function constructData(data) {
+  readline.clearLine(process.stdout, 0);
+  readline.cursorTo(process.stdout, 0, null);
+  rl.write('Constructing Data...');
+
   return new Promise((resolve, reject) => {
     // data should be an object
     if (typeof data !== 'object') {
@@ -150,6 +155,13 @@ function constructData(data) {
       data = [data];
     }
 
+    // validate family names
+    let invalidFamilyNames = data.filter(config => !iconFamilyMap[config.family] && !config.directory);
+    if (invalidFamilyNames.length) {
+      reject(`Invalid icon family [${invalidFamilyNames.map(config => config.family || '?').join(', ')}] - available sets: [${Object.keys(iconFamilyMap).join(', ')}]`);
+      return;
+    }
+
     /** collection of configs **/
     if (data && data.length) {
       data = data.map(config => {
@@ -161,7 +173,7 @@ function constructData(data) {
             case 'weather': // /weather-icons/svg
               currentConfig.directory = path.resolve(__dirname, 'node_modules', 'weather-icons', 'svg');
               break;
-            case 'mdi': // /mdi-svg/svg
+            case 'material': // /mdi-svg/svg
               currentConfig.directory = path.resolve(__dirname, 'node_modules', 'mdi-svg', 'svg');
               break;
           }
@@ -195,6 +207,10 @@ function constructData(data) {
  * @return {Promise.<*[]>}
  */
 function buildIcons(data) {
+  readline.clearLine(process.stdout, 0);
+  readline.cursorTo(process.stdout, 0, null);
+  rl.write('Building Icon Sets...');
+
   return Promise.all(data.map(config => {
     return new Promise((resolve, reject) => {
       let iconMap = config.icons.map(icon => {
@@ -252,6 +268,10 @@ function buildIcons(data) {
  * @return {Promise}
  */
 function buildFile(svg) {
+  readline.clearLine(process.stdout, 0);
+  readline.cursorTo(process.stdout, 0, null);
+  rl.write('Writing New File...');
+
   return new Promise((resolve, reject) => {
     // add the svg and iconMap into the template
     let template = iconTemplate.replace(/__svgSymbols__/, svg.join(''));
