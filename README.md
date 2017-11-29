@@ -48,7 +48,7 @@ I did a complete overhaul of the build process (even reduced the code footprint 
 
 ## Icons
 
-This repo depends on open source SVG icon sets. Icons sets available:
+This repo depends on open source SVG icon sets. Icons available:
 
 - [Material Design Icons](https://materialdesignicons.com/) (family = `mdi`)
 - [weather-icons](https://github.com/erikflowers/weather-icons/) (family = `weather`)
