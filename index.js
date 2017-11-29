@@ -2,169 +2,217 @@
 
 const fs = require('fs');
 const path = require('path');
-const iconMapPrepend = require('./src/icon-map');
-const iconTemplate = require('./src/icon-template');
+const readline = require('readline');
 const program = require('commander');
 const htmlClean = require('htmlclean');
 const cheerio = require('cheerio');
+require('colors');
 
-let iconFamily = 'material',
-    icons = [],
-    outputMap = {},
-    outputPath,
-    fileType = 'js',
+const iconTemplate = require('./src/icon-template');
+
+let outputPath,
     filePath,
-    fileName;
+    fileName,
+    extension,
+    outputMap = {},
+    outputFileName = 'icon-symbols.js',
+    defaultOptions = {
+      family: 'material',
+      directory: '',
+      map: true,
+      prepend: false,
+      icons: []
+    };
 
-// declare program
-program
-    .description(`Command line tool for quickly building icon sets`)
-    .arguments('<file> [path]')
-    .option(`-O, --output [output]`, `Set output path. Defaults to <file> location.`)
-    .option(`-I, --icon-family [icon-family]`, `Declare an Icon Family. Defaults to 'material'.`)
-    .option(`-T, --file-type [file-type]`, `Declare file type (js or ts). Defaults to 'js'.`)
-    .option(`-E, --export-type [export-type]`, `Declare module export syntax (umd, commonjs, es6). Defaults to 'es6'.`)
-    .action(function(file) {
-      fileName = file;
-      filePath = `/${path.relative('/', file)}`;
+// start read line
+const rl = readline.createInterface({
+  input: process.stdin,
+  output: process.stdout
+});
+
+rl.write('Building Icons...');
+
+runProgram()
+    .then(getFile)
+    .then(constructData)
+    .then(buildIcons)
+    .then(buildFile)
+    .then(() => {
+      readline.clearLine(process.stdout, 0);
+      readline.cursorTo(process.stdout, 0, null);
+      console.log('Success!'.green);
+      rl.close();
     })
-    .parse(process.argv);
-
-if (!filePath) {
-  throw Error(`File is required`);
-}
-
-// get things going
-getIconsFromFile(filePath).then(
-    data => {
-
-      let svgFolder = '';
-      let badDataError = `Can't seem to read the contents of ${fileName}`;
-
-      outputPath = getOutputPath(program.output);
-
-      // data should be an object
-      if (typeof data !== 'object') throw Error(badDataError);
-
-      /** array of strings **/
-      if (data && data.length && typeof data[0] === 'string') {
-
-        // figure out svg directory path
-        switch (program.iconFamily) {
-          case 'weather': // /weather-icons/svg
-            svgFolder = path.resolve(__dirname, 'node_modules', 'weather-icons', 'svg');
-            break;
-          case 'material': // /mdi-svg/svg
-          default:
-            svgFolder = path.resolve(__dirname, 'node_modules', 'mdi-svg', 'svg');
-            break;
-        }
-
-        // use all icons in the svg directory
-        if (data && data.length === 1 && data[0] === '*') {
-          icons = fs.readdirSync(svgFolder, {encoding: 'utf8'}, function(err, filenames) {
-            if (err) {
-              throw Error(err);
-            }
-            return filenames;
-          });
-          icons = icons.map(icon => {
-            return icon.replace('.svg', '');
-          });
-          return buildIcons([{
-            family: setDefaultIconFamily(program.iconFamily),
-            directory: svgFolder,
-            icons: icons,
-            prepend: iconMapPrepend[setDefaultIconFamily(program.iconFamily)]
-          }]);
-        }
-
-        // use data
-        else if (data) {
-          outputPath = getOutputPath(program.output);
-          icons = data;
-          return buildIcons([{
-            family: setDefaultIconFamily(program.iconFamily),
-            directory: svgFolder,
-            icons: icons,
-            prepend: iconMapPrepend[setDefaultIconFamily(program.iconFamily)]
-          }]);
-        }
-
-        else {
-          return Promise.reject();
-        }
-      }
-
-      /** single config **/
-      // put it in an array and handle it like a collection
-      else if (data && data.icons) {
-        data = [data];
-      }
-
-      /** collection of configs **/
-      if (data && data.length) {
-        data.forEach(config => {
-          if (!config.directory) {
-            switch (config.family) {
-              case 'weather': // /weather-icons/svg
-                config.directory = path.resolve(__dirname, 'node_modules', 'weather-icons', 'svg');
-                break;
-              case 'material': // /mdi-svg/svg
-                config.directory = path.resolve(__dirname, 'node_modules', 'mdi-svg', 'svg');
-                break;
-            }
-          } else if (!config.prepend) {
-            config.prepend = 'custom';
-          }
-
-          let iconSet;
-          if (config.icons && config.icons.length === 1 && config.icons[0] === '*') {
-            iconSet = fs.readdirSync(config.directory, {encoding: 'utf8'}, function (err, filenames) {
-              if (err) {
-                throw Error(err);
-              }
-              return filenames;
-            });
-            iconSet = iconSet.map(icon => {
-              return icon.replace('.svg', '');
-            });
-            config.icons = iconSet;
-          }
-        });
-        return buildIcons(data);
-
-      } else {
-        throw Error(badDataError)
-      }
-
-    }).then(
-        svg => {
-          buildFile(svg);
-          console.log('Success!');
-          // return buildIcons(res)
-        }).catch(err => console.error(err));
-
-
-function buildFile(svg) {
-  return new Promise((resolve, reject) => {
-    // add the svg and iconMap into the template
-    let template = iconTemplate.replace(/__svgSymbols__/g, svg.join(''));
-    if (Object.keys(outputMap).length > 0 && outputMap.constructor === Object) {
-      template = template.replace(/__iconMap__/, JSON.stringify(outputMap));
-    }
-    fs.writeFile(outputPath, template, err => {
-      if (err) throw err;
+    .catch(err => {
+      readline.clearLine(process.stdout, 0);
+      readline.cursorTo(process.stdout, 0, null);
+      console.log(`[ico Error] ${err}`.red);
+      rl.close();
     });
+
+
+/**
+ * Run Program
+ * run commander and setup paths and things
+ * @return {Promise}
+ */
+function runProgram() {
+  return new Promise((resolve, reject) => {
+    program
+        .description(`Command line tool for quickly building icon sets`)
+        .arguments('<file> [path]')
+        .option(`-O, --output [output]`, `Set output path. Defaults to <file> location.`)
+        .action(function(file) {
+
+          // normalize file path (includes file name)
+          filePath = `/${path.relative('/', path.normalize(file))}`;
+          let filePathParsed = path.parse(filePath);
+
+          // extension
+          if (file.lastIndexOf('.') > -1) {
+            extension = file.slice(file.lastIndexOf('.')+1);
+          } else {
+            reject(`<file> must be a JSON or JS file`);
+            return;
+          }
+          if (extension !== 'js' && extension !== 'json') {
+            reject(`<file> must be a JSON or JS file`);
+            return;
+          }
+
+          // file name
+          fileName = filePathParsed.name + filePathParsed.ext;
+
+          // output path
+          if (program.output) {
+            outputPath = `/${path.relative('/', path.normalize(program.output))}`;
+          } else {
+            outputPath = filePathParsed.dir;
+          }
+        })
+        .parse(process.argv);
+
+    if (!filePath) {
+      reject(`<file> is required`);
+      return;
+    }
+    resolve();
   });
 }
 
-function buildIcons(configs) {
-  return Promise.all(configs.map(config => {
+
+/**
+ * Get File
+ * get file depending on extension
+ * @return {Promise} resolves the file contents
+ */
+function getFile() {
+  return new Promise((resolve, reject) => {
+    // read json file
+    if (extension === 'json') {
+      fs.readFile(filePath, 'utf8', (err, data) => {
+        if (err) {
+          reject(`Could not open "${filePath}".`, err);
+        } else {
+          resolve(JSON.parse(data));
+        }
+      });
+    }
+
+    // require module
+    else if (extension === 'js') {
+      resolve(require(filePath));
+    }
+  });
+}
+
+
+/**
+ * Construct Data
+ * build icon collection based on file config
+ * @param data {Object}
+ * @return {Promise}
+ */
+function constructData(data) {
+  return new Promise((resolve, reject) => {
+    // data should be an object
+    if (typeof data !== 'object') {
+      reject('Icon configuration should be an "Object" or "Array" type.');
+      return;
+    }
+
+    // if set is a collection, make sure all configs have a prepend
+    if (data.length && data.filter(config => typeof config.prepend === 'string').length !== data.length) {
+      reject('A collection of icon configs requires option "prepend" to avoid naming collisions');
+      return;
+    }
+
+    /** single config **/
+    // put it in an array and handle it like a collection
+    if (data && data.icons) {
+      data = [data];
+    }
+
+    /** collection of configs **/
+    if (data && data.length) {
+      data = data.map(config => {
+        // tack on default options
+        let currentConfig = Object.assign({}, defaultOptions, config);
+
+        if (!currentConfig.directory) {
+          switch (currentConfig.family) {
+            case 'weather': // /weather-icons/svg
+              currentConfig.directory = path.resolve(__dirname, 'node_modules', 'weather-icons', 'svg');
+              break;
+            case 'material': // /mdi-svg/svg
+              currentConfig.directory = path.resolve(__dirname, 'node_modules', 'mdi-svg', 'svg');
+              break;
+          }
+        }
+
+        let iconSet;
+        if (currentConfig.icons && currentConfig.icons.length === 1 && currentConfig.icons[0] === '*') {
+          iconSet = fs.readdirSync(currentConfig.directory, {encoding: 'utf8'}, function (err, filenames) {
+            if (err) {
+              reject(err);
+            }
+            return filenames;
+          });
+          iconSet = iconSet.map(icon => {
+            return icon.replace('.svg', '');
+          });
+          currentConfig.icons = iconSet;
+        }
+        return currentConfig;
+      });
+      resolve(data);
+    } else {
+      reject(badDataError)
+    }
+  });
+}
+
+
+/**
+ * Build Icons
+ * @param data {Array}
+ * @return {Promise.<*[]>}
+ */
+function buildIcons(data) {
+  return Promise.all(data.map(config => {
     return new Promise((resolve, reject) => {
       let iconMap = config.icons.map(icon => {
         let file;
-        file = fs.readFileSync(path.resolve(config.directory, `${icon}.svg`), 'utf8');
+        let retrieveIconName;
+        let iconName = icon;
+        // weather icons have a prepended 'wi-' on the file names
+        // need to add that to get the right file
+        if (config.family === 'weather') {
+          retrieveIconName = `wi-${iconName}`;
+        } else {
+          retrieveIconName = iconName;
+        }
+        file = fs.readFileSync(path.resolve(config.directory, `${retrieveIconName}.svg`), 'utf8');
         // remove common svg nonsense
         file = file.replace(/<\?xml(.*?)>|<!DOCTYPE(.*?)>|^ /g, '');
         file = file.replace(/<style(.*?)>*<\/style>/g, '');
@@ -184,15 +232,8 @@ function buildIcons(configs) {
           symbol[0].attribs.viewbox = viewBox;
         }
 
-        // handle prepended name
-        let iconName = icon;
         if (config.prepend) {
-          // remove weather's 'wi-' prepended name
-          if (config.family === 'weather') {
-            iconName = icon.replace('wi-', `${config.prepend}-`);
-          } else {
-            iconName = `${config.prepend}-${iconName}`
-          }
+          iconName = `${config.prepend}-${iconName}`
         }
 
         if (config.map) {
@@ -209,62 +250,26 @@ function buildIcons(configs) {
   }));
 }
 
-
 /**
- * Get Icons From File
- * @param filePath
+ * Build File
+ * @param svg {String}
  * @return {Promise}
  */
-function getIconsFromFile(filePath) {
+function buildFile(svg) {
   return new Promise((resolve, reject) => {
-    let ext = filePath.slice(filePath.lastIndexOf('.')+1);
-
-    // read json file
-    if (ext === 'json') {
-      fs.readFile(filePath, 'utf8', (err, data) => {
-        if (err) {
-          console.error(`Could not open "${filePath}". Process stopped because of Error.`, err);
-          reject(err);
-        } else {
-          resolve(JSON.parse(data));
-        }
-      });
-    }
-
-    // require module
-    else if (ext === 'js') {
-      resolve(require(filePath));
-    }
-
-    // got nothing
-    else {
-      console.error(`Error: <file> must be a valid JSON array`);
-    }
-  }).catch(err => {
-    throw Error(err);
-  });
-}
-
-function setDefaultIconFamily(iconFamilyInput) {
-  let returnIconFamily = 'material';
-  if (iconFamilyInput) {
-    if (iconMapPrepend[iconFamilyInput]) {
-      returnIconFamily = iconFamilyInput;
+    // add the svg and iconMap into the template
+    let template = iconTemplate.replace(/__svgSymbols__/, svg.join(''));
+    if (Object.keys(outputMap).length > 0 && outputMap.constructor === Object) {
+      template = template.replace(/__iconMap__/, JSON.stringify(outputMap));
     } else {
-      console.error(`
-        "${iconFamilyInput}" is not a valid icon family. Defaulting to "material".`,
-          `Available Icon families: ${Object.keys(iconMapPrepend).join(', ')}.`
-      );
+      template = template.replace(/__iconMap__/, '{}');
     }
-  }
-  return iconFamilyInput = returnIconFamily;
-}
-
-function getOutputPath(output) {
-  let fileName = `svg-symbols.${fileType}`;
-  if (output) {
-    return `${output}/${fileName}`;
-  } else {
-    return `${path.parse(filePath).dir}/${fileName}`
-  }
+    fs.writeFile(`${outputPath}/${outputFileName}`, template, err => {
+      if (err) {
+        throw err
+      } else {
+        resolve();
+      }
+    });
+  });
 }

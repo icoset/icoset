@@ -1,6 +1,6 @@
 {
   "name": "@geocompy/icosystem-cli",
-  "version": "0.2.5",
+  "version": "0.3.0",
   "description": "Command line tool for quickly building icon sets",
   "main": "index.js",
   "scripts": {
@@ -21,9 +21,13 @@
   "homepage": "https://github.com/geoctrl/icosystem-cli#readme",
   "dependencies": {
     "cheerio": "^0.22.0",
+    "colors": "^1.1.2",
     "commander": "^2.9.0",
     "htmlclean": "^3.0.2",
     "mdi-svg": "github:Templarian/MaterialDesign-SVG",
     "weather-icons": "github:erikflowers/weather-icons"
+  },
+  "devDependencies": {
+    "font-awesome-pro": "github:FortAwesome/Font-Awesome-Pro"
   }
 }
