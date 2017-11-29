@@ -60,8 +60,8 @@ I did a complete overhaul of the build process (even reduced the code footprint 
 
 This repo depends on open source SVG icon sets. Icons sets available:
 
-- [Material Design Icons](https://materialdesignicons.com/) (family = `mdi)
-- [weather-icons](https://github.com/erikflowers/weather-icons/)
+- [Material Design Icons](https://materialdesignicons.com/) (family = `mdi`)
+- [weather-icons](https://github.com/erikflowers/weather-icons/) (family = `weather`)
 - **More coming soon.**
 
 You can also use local icon sets - see [Custom Icon Sets](#custom-icon-sets) to learn more.
@@ -77,7 +77,7 @@ The CLI requires a config file that tells it how to retrieve icons and how to pr
 
 ```javascript
 module.exports = {
-  family: 'material',
+  family: 'mdi',
   icons: ['account', 'magnify']
 };
 ```
@@ -112,9 +112,9 @@ module.exports = [
       prepend: 'wi'
     },
     {
-      family: 'material',
+      family: 'mdi',
       icons: ['account', 'magnify'],
-      prepend: 'mid'
+      prepend: 'mdi'
     }
 ];
 ```
