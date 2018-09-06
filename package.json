@@ -2,9 +2,11 @@
   "name": "@geocompy/icosystem-cli",
   "version": "0.3.1",
   "description": "Command line tool for quickly building icon sets",
-  "main": "index.js",
+  "main": "src/index.js",
   "scripts": {
-    "ico-test": "ico"
+    "ico-test": "ico",
+    "test": "jest",
+    "test-watch": "jest --watchAll"
   },
   "repository": {
     "type": "git",
@@ -13,7 +15,7 @@
   "author": "@geoctrl",
   "license": "MIT",
   "bin": {
-    "ico": "./index.js"
+    "ico": "src/index.js"
   },
   "bugs": {
     "url": "https://github.com/geoctrl/icosystem-cli/issues"
@@ -28,6 +30,7 @@
     "weather-icons": "github:erikflowers/weather-icons"
   },
   "devDependencies": {
-    "font-awesome-pro": "github:FortAwesome/Font-Awesome-Pro"
+    "font-awesome-pro": "github:FortAwesome/Font-Awesome-Pro",
+    "jest": "^23.5.0"
   }
 }
