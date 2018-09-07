@@ -25,9 +25,7 @@
     "cheerio": "^0.22.0",
     "colors": "^1.1.2",
     "commander": "^2.9.0",
-    "htmlclean": "^3.0.2",
-    "mdi-svg": "github:Templarian/MaterialDesign-SVG",
-    "weather-icons": "github:erikflowers/weather-icons"
+    "htmlclean": "^3.0.2"
   },
   "devDependencies": {
     "font-awesome-pro": "github:FortAwesome/Font-Awesome-Pro",

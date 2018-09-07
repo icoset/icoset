@@ -21,14 +21,12 @@ module.exports = function constructData(data) {
     let config = data.config;
     // data should be an object
     if (typeof config !== 'object') {
-      reject('Icon configuration should be an Object or an Array.');
-      return;
+      return reject('Icon configuration should be an Object or an Array.');
     }
 
     // if set is a collection, make sure all configs have a prepend
     if (config.length && config.filter(config => typeof config.prepend === 'string').length !== config.length) {
-      reject('A collection of icon configs requires option "prepend" to avoid naming collisions');
-      return;
+      return reject('A collection of icon configs requires option "prepend" to avoid naming collisions');
     }
 
     /** single config **/
@@ -37,19 +35,21 @@ module.exports = function constructData(data) {
       config = [config];
     }
 
-    // TODO: we shouldn't hard code svg library-things...
-    // I'm thinking we should create "mapping" npm packages that gives this
-    // module something to point to...
-    // EG:
-    // @ico/core
-    // @ico/preset-mdi
-    // @ico/preset-weather-icons
+    // validate preset
+    // TODO: HERE
+    if (config.preset) {
+      let preset;
+      try {
+        preset = require(config.preset);
+      } catch (e) {
+        reject(`Unable to use ${config.preset}`, e);
+      }
+    }
 
     // validate family names
     let invalidFamilyNames = config.filter(config => !iconFamilyMap[config.family] && !config.directory);
     if (invalidFamilyNames.length) {
-      reject(`Invalid icon family [${invalidFamilyNames.map(config => config.family || '?').join(', ')}] - available sets: [${Object.keys(iconFamilyMap).join(', ')}]`);
-      return;
+      return reject(`Invalid icon family [${invalidFamilyNames.map(config => config.family || '?').join(', ')}] - available sets: [${Object.keys(iconFamilyMap).join(', ')}]`);
     }
 
     /** collection of configs **/

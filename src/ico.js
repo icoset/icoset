@@ -8,15 +8,11 @@ const htmlClean = require('htmlclean');
 const cheerio = require('cheerio');
 require('colors');
 
-const { walk, getFile } = require('./utils');
+const getConfig = require('./get-config');
 const constructData = require('./construct-data');
 const iconTemplate = require('./icon-template');
 
-let outputPath,
-    filePath,
-    configName,
-    outputMap = {},
-    outputFileName = 'icon-symbols.js';
+let defaultOutputName = 'icon-symbols.js';
 
 // start read line
 const rl = readline.createInterface({
@@ -31,7 +27,7 @@ runProgram()
     readline.clearLine(process.stdout, 0);
     readline.cursorTo(process.stdout, 0, null);
     rl.write('Getting File...');
-    return getFile(...args)
+    return getConfig(...args)
   })
   .then((...args) => {
     readline.clearLine(process.stdout, 0);
@@ -63,26 +59,34 @@ function runProgram() {
   return new Promise((resolve, reject) => {
     program
       .description(`Command line tool for quickly building icon sets`)
-      .arguments('<file> [path]')
+      .option(`-C, --config [config]`, `Point to the config file.`)
       .option(`-O, --output [output]`, `Set output path. Defaults to <file> location.`)
-      .action((file) => processFile(file, resolve, reject))
+      .option(`-N, --name [name]`, `Name the generated output file. Default is "${defaultOutputName}"`)
+      .action(() => {
+        let configPath, configIcosetrc;
+        if (program.config) {
+          configPath = path.resolve(path.relative(process.cwd(), program.config));
+        } else {
+          configIcosetrc = true;
+          configPath = `${appRoot}/iconset.config.js`;
+        }
+        const outputPath = program.output
+          ? path.resolve(path.relative(process.cwd(), program.output))
+          : path.dirname(configPath);
+
+        const outputName = program.name
+          ? program.name
+          : defaultOutputName;
+
+        resolve({
+          configIcosetrc,
+          outputName,
+          outputPath,
+          configPath,
+        });
+      })
       .parse(process.argv);
   });
-}
-
-function processFile(file, resolve, reject) {
-  const filePath = path.resolve(path.relative(process.cwd(), file));
-  const filePathParsed = path.parse(filePath);
-  const configName = filePathParsed.base;
-  const outputPath = program.output
-    ? path.resolve(path.relative(process.cwd(), program.output))
-    : filePathParsed.dir;
-
-  if (filePathParsed.ext !== '.js' && filePathParsed.ext !== '.json' && filePathParsed.base !== '.icorc') {
-    reject(`<file> must be a JSON, JS or .icorc file`);
-  }
-  if (!filePath) reject(`<file> is required`);
-  resolve({ configName, filePath, outputPath });
 }
 
 
