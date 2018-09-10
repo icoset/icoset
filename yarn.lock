@@ -1009,10 +1009,6 @@ find-up@^2.1.0:
   dependencies:
     locate-path "^2.0.0"
 
-"font-awesome-pro@github:FortAwesome/Font-Awesome-Pro":
-  version "5.3.1"
-  resolved "git+ssh://git@github.com/FortAwesome/Font-Awesome-Pro.git#afdec679d533ab2fc6e0c4dbbc14e1d13e76ae8d"
-
 for-in@^1.0.1, for-in@^1.0.2:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/for-in/-/for-in-1.0.2.tgz#81068d295a8142ec0ac726c6e2200c30fb6d5e80"
@@ -1217,10 +1213,6 @@ html-encoding-sniffer@^1.0.2:
   resolved "https://registry.yarnpkg.com/html-encoding-sniffer/-/html-encoding-sniffer-1.0.2.tgz#e70d84b94da53aa375e11fe3a351be6642ca46f8"
   dependencies:
     whatwg-encoding "^1.0.1"
-
-htmlclean@^3.0.2:
-  version "3.0.8"
-  resolved "https://registry.yarnpkg.com/htmlclean/-/htmlclean-3.0.8.tgz#cea451cf5399d4018386a57129489f2d630e62b0"
 
 htmlparser2@^3.9.1:
   version "3.9.2"
@@ -2198,10 +2190,6 @@ mkdirp@^0.5.0, mkdirp@^0.5.1, mkdirp@~0.5.1:
   resolved "http://registry.npmjs.org/mkdirp/-/mkdirp-0.5.1.tgz#30057438eac6cf7f8c4767f38648d6697d75c903"
   dependencies:
     minimist "0.0.8"
-
-mock-fs@^4.6.0:
-  version "4.6.0"
-  resolved "https://registry.yarnpkg.com/mock-fs/-/mock-fs-4.6.0.tgz#d944ef4c3e03ceb4e8332b4b31b8ac254051c8ae"
 
 ms@2.0.0:
   version "2.0.0"
