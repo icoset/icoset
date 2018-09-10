@@ -1,8 +1,6 @@
 const getConfig = require('./get-config');
-const mock = require('mock-fs');
 
 describe('Get Config', function () {
-
 
   test('if config path is not defined, check if "icoset.config.js" exists and use that', async () => {
     global.appRoot = '../test';

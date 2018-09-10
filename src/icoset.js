@@ -8,8 +8,17 @@ const getConfig = require('./get-config');
 const constructData = require('./construct-data');
 const buildIcons = require('./build-icons');
 const buildFile = require('./build-file');
-
 let defaultOutputName = 'icon-symbols.js';
+
+program
+  .description(`Command line tool for quickly building icon sets`)
+  .option(`-C, --config [config]`, `Point to the config file. Defaults to "icoset.config.js" for zero-config.`)
+  .option(`-S, --svgPath [svgPath]`, `Point to the svg folder. Only for zero-config setup.`)
+  .option(`-O, --outputPath [outputPath]`, `Set output path. Defaults to the config location.`)
+  .option(`-N, --outputName [outputName]`, `Set output name. Defaults to "${defaultOutputName}".`)
+  .option(`-P, --preserveFolderNames [preserveFolderNames]`, `Preserve folder names in the icon names (/folder/icon.svg becomes 'folder-icon.svg'. Default is false.`)
+  .option(`-M, --viewBoxMap [viewBoxMap]`, `Generate map of all the icon viewBox's. Useful when working with the "use" tag.`)
+  .parse(process.argv);
 
 // start read line
 const rl = readline.createInterface({
@@ -17,6 +26,7 @@ const rl = readline.createInterface({
   output: process.stdout
 });
 
+// print next line
 const nextLine = (line) => {
   readline.clearLine(process.stdout, 0);
   readline.cursorTo(process.stdout, 0, null);
@@ -25,62 +35,35 @@ const nextLine = (line) => {
   }
 }
 
-/**
- * Run Program
- * run commander and setup paths and things
- * @return {Promise}
- */
-function runProgram() {
-  return new Promise((resolve) => {
-    program
-      .description(`Command line tool for quickly building icon sets`)
-      .option(`-C, --config [config]`, `Point to the config file. Defaults to "icoset.config.js" for zero-config.`)
-      .option(`-S, --svgPath [svgPath]`, `Point to the svg folder. Only for zero-config setup.`)
-      .option(`-O, --outputPath [outputPath]`, `Set output path. Defaults to the config location.`)
-      .option(`-N, --outputName [outputName]`, `Set output name. Defaults to "${defaultOutputName}".`)
-      .option(`-P, --preserveFolderNames [preserveFolderNames]`, `Preserve folder names in the icon names (/folder/icon.svg becomes 'folder-icon.svg'. Default is false.`)
-      .option(`-M, --viewBoxMap [viewBoxMap]`, `Generate map of all the icon viewBox's. Useful when working with the "use" tag.`)
-      .action(() => {
-        const configPath = program.config
-          ? path.resolve(path.relative(process.cwd(), program.config))
-          : false;
-        const svgPath = program.svgPath
-          ? path.resolve(path.relative(process.cwd(), program.svgPath))
-          : false;
-        const outputPath = program.outputPath
-          ? path.resolve(path.relative(process.cwd(), program.outputPath))
-          : false;
-        const outputName = program.outputName || false;
-        const preserveFolderNames = !!program.preserveFolderNames;
-        const viewBoxMap = !!program.viewBoxMap;
-        return resolve({
-          configPath,
-          svgPath,
-          originalSvgPath: program.svgPath,
-          outputPath,
-          outputName,
-          preserveFolderNames,
-          viewBoxMap,
-          defaultOutputName,
-        });
+const configPath = program.config
+  ? path.resolve(path.relative(process.cwd(), program.config))
+  : false;
+const svgPath = program.svgPath
+  ? path.resolve(path.relative(process.cwd(), program.svgPath))
+  : false;
+const outputPath = program.outputPath
+  ? path.resolve(path.relative(process.cwd(), program.outputPath))
+  : false;
+const outputName = program.outputName || false;
+const preserveFolderNames = !!program.preserveFolderNames;
+const viewBoxMap = !!program.viewBoxMap;
 
-      })
-      .parse(process.argv);
-  });
-}
-
-rl.write('Building Icons...');
+rl.write('Getting Config...');
 
 // run!
-runProgram()
-  .then((data) => {
-    nextLine('Getting Config...');
-    return getConfig(data)
-  })
-  .then((data) => {
-    nextLine('Constructing Data...');
-    return constructData(data);
-  })
+getConfig({
+  configPath,
+  svgPath,
+  originalSvgPath: program.svgPath,
+  outputPath,
+  outputName,
+  preserveFolderNames,
+  viewBoxMap,
+  defaultOutputName,
+}).then((data) => {
+  nextLine('Constructing Data...');
+  return constructData(data);
+})
   .then((data) => {
     nextLine('Building Icon Sets...');
     return buildIcons(data);
