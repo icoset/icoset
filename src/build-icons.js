@@ -1,5 +1,4 @@
 const fs = require('fs');
-const cheerio = require('cheerio');
 const SVGO = require('svgo');
 
 const defaultSvgoConfig = {
@@ -66,24 +65,23 @@ module.exports = function buildIcons(data) {
               .map(key => ({ [key]: svgoPlugins[key] }))
           });
           svgo.optimize(file).then(optimizedFile => {
-            file = optimizedFile.data
-              .replace(/svg>/g, 'symbol>')
-              .replace(/<svg/g, '<symbol');
-            let $ = cheerio.load(file, {
-              normalizeWhitespace: true,
-              decodeEntities: false
-            });
-            let symbol = $('symbol');
+            file = optimizedFile.data;
             let iconName = mapCheck(icon.fullName);
             if (rule.prepend) {
               iconName = `${rule.prepend}${iconName}`
             }
-            let viewBox = symbol[0].attribs.viewbox;
-            if (data.viewBoxMap || data.config.viewBoxMap) {
+            let viewBox = file.match(RegExp('viewBox="([^"]*)"'))[0];
+            if (viewBox && (data.viewBoxMap || data.config.viewBoxMap)) {
+              viewBox = viewBox.slice(0, viewBox.length - 2);
+              viewBox = viewBox.slice(viewBox.indexOf('"') + 1);
               viewBoxMap[iconName] = { viewBox };
             }
-            symbol.attr('id', iconName);
-            resolveSvgo($.html());
+            file = file
+              .replace(/svg>/g, 'symbol>')
+              .replace(/<svg/g, '<symbol')
+              .replace('<symbol', `<symbol id="${iconName}"`);
+
+            resolveSvgo(file);
           }, (err) => {
             throw Error(err);
           });
