@@ -1,92 +1,68 @@
-const fs = require('fs');
 const path = require('path');
-const iconFamilyMap = require('./icon-family-map');
+const walk = require('./walk');
 
-const defaultOptions = {
-  family: 'material',
-  directory: '',
-  map: true,
-  prepend: false,
-  icons: []
-};
-
-/**
- * Construct Data
- * build icon collection based on file config
- * @param data {Object}
- * @return {Promise}
- */
 module.exports = function constructData(data) {
-  return new Promise((resolve, reject) => {
-    let config = data.config;
-    // data should be an object
-    if (typeof config !== 'object') {
-      return reject('Icon configuration should be an Object or an Array.');
+  return new Promise((resolve) => {
+    let rules;
+    if (!data.configPath && data.svgPath) {
+      // zero config
+      data.config = {};
+      rules = { icons: ['*'], directory: data.svgPath };
+    } else {
+      rules = data.config.rules;
     }
-
-    // if set is a collection, make sure all configs have a prepend
-    if (config.length && config.filter(config => typeof config.prepend === 'string').length !== config.length) {
-      return reject('A collection of icon configs requires option "prepend" to avoid naming collisions');
+    // rules should be an object
+    if (typeof rules !== 'object') {
+      throw Error('Icon configuration should be an Object or an Array.');
     }
-
     /** single config **/
     // put it in an array and handle it like a collection
-    if (config && config.icons) {
-      config = [config];
+    if (!Array.isArray(rules)) {
+      rules = [rules];
     }
 
-    // validate preset
-    // TODO: HERE
-    if (config.preset) {
-      let preset;
-      try {
-        preset = require(config.preset);
-      } catch (e) {
-        reject(`Unable to use ${config.preset}`, e);
+    // use presets to build directory paths
+    rules = rules.map(rule => {
+      if (rule.preset) {
+        let directoryPath;
+        try {
+          directoryPath = require(rule.preset)();
+        } catch (e) {
+          throw Error(e);
+        }
+        rule.directory = path.join(
+          appRoot,
+          'node_modules',
+          rule.preset,
+          directoryPath
+        );
       }
-    }
+      return rule;
+    });
 
-    // validate family names
-    let invalidFamilyNames = config.filter(config => !iconFamilyMap[config.family] && !config.directory);
-    if (invalidFamilyNames.length) {
-      return reject(`Invalid icon family [${invalidFamilyNames.map(config => config.family || '?').join(', ')}] - available sets: [${Object.keys(iconFamilyMap).join(', ')}]`);
-    }
-
-    /** collection of configs **/
-    if (config && config.length) {
-      config = config.map(config => {
-        // tack on default options
-        let currentConfig = Object.assign({}, defaultOptions, config);
-
-        if (!currentConfig.directory) {
-          switch (currentConfig.family) {
-            case 'weather': // /weather-icons/svg
-              currentConfig.directory = path.resolve(__dirname, 'node_modules', 'weather-icons', 'svg');
-              break;
-            case 'material': // /mdi-svg/svg
-              currentConfig.directory = path.resolve(__dirname, 'node_modules', 'mdi-svg', 'svg');
-              break;
-          }
-        }
-
-        let iconSet;
-        if (currentConfig.icons && currentConfig.icons.length === 1 && currentConfig.icons[0] === '*') {
-          iconSet = fs.readdirSync(currentConfig.directory, {encoding: 'utf8'}, function (err, filenames) {
-            if (err) {
-              reject(err);
-            }
-            return filenames;
+    Promise.all(rules.map(rule => {
+      return walk(
+        path.resolve(path.relative(process.cwd(), rule.directory)),
+        data.preserveFolderNames || data.config.preserveFolderNames,
+        rule.icons
+      );
+    }))
+      .then(
+        (icons) => {
+          resolve({
+            ...data,
+            config: {
+              ...data.config,
+              rules: rules.map((rule, index) => {
+                rule.icons = [...icons[index]];
+                return rule;
+              }),
+            },
           });
-          iconSet = iconSet.map(icon => {
-            return icon.replace('.svg', '');
-          });
-          currentConfig.icons = iconSet;
+        },
+        (err) => {
+          throw Error(err);
         }
-        return currentConfig;
-      });
-      resolve(config);
-    } else {
-      reject(badDataError)
-    }
+      );
   });
 }

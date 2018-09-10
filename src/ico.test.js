@@ -1,5 +1,0 @@
-describe('ico', () => {
-  test('things', () => {
-
-  });
-});

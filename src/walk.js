@@ -7,39 +7,38 @@ const isSvg = (svg) => {
   return svg.slice(svg.lastIndexOf('.')) === '.svg';
 };
 
-module.exports = function walk(dir, done, preserveFolderNames) {
-  const iconMap = {};
-
-  const mapCheck = (name) => {
-    const base = name.slice(0, name.lastIndexOf('.'));
-    if (iconMap[base] >= 1) {
-      iconMap[base] += 1;
-      const newName = `${base}-${iconMap[base]}.svg`;
-      console.log(`Duplicate svg name "${name}" changed to "${newName}."`.bgYellow.black);
-      console.log(`Consider de-duping your icon names or using the "preserveFolderNames" option.`)
-      return newName;
-    } else {
-      iconMap[base] = 1;
-      return name;
-    }
-  }
-
+/**
+ * Walk
+ * Take a stroll through all files/sub-folders to find svgs
+ * @param {string} dir
+ * @param {boolean=} preserveFolderNames
+ * @param {array=} iconList
+ * @return {Promise} => collection of icons
+ */
+module.exports = function walk(dir, preserveFolderNames = false, iconList = []) {
   const buildIconObj = (icon) => {
     if (typeof icon === 'object') return icon;
+    const name = icon.slice(icon.lastIndexOf('/') + 1).replace(/\.svg/, '');
     if (preserveFolderNames) {
       return {
-        name: mapCheck(icon.replace(RegExp(dir, 'g'), '').slice(1).replace(/\//g, '-')),
+        fullName: icon
+          .replace(RegExp(dir, 'g'), '')
+          .slice(1)
+          .replace(/\//g, '-'),
         path: icon,
+        name,
       };
     } else {
       return {
-        name: mapCheck(icon.slice(icon.lastIndexOf('/') + 1)),
+        fullName: icon
+          .slice(icon.lastIndexOf('/') + 1),
         path: icon,
+        name,
       };
     }
   }
 
-  function run(_dir, _done) {
+  const iterate = (_dir, _done) => {
     let results = [];
     fs.readdir(_dir, function(err, list) {
       if (err) return _done(err);
@@ -49,17 +48,35 @@ module.exports = function walk(dir, done, preserveFolderNames) {
         file = path.resolve(_dir, file);
         fs.stat(file, function(err, stat) {
           if (stat && stat.isDirectory()) {
-            run(file, function(err, res) {
+            iterate(file, function(err, res) {
               results = results.concat(res.filter(isSvg).map(buildIconObj));
-              if (!--pending) _done(null, results);
+              if (!--pending) _done(err, results);
             });
           } else {
-            if (isSvg(file)) results.push(file);
-            if (!--pending) _done(null, results);
+            if (isSvg(file)) results.push(buildIconObj(file));
+            if (!--pending) _done(err, results);
           }
         });
       });
     });
   }
-  run(dir, done);
+
+  return new Promise((resolve, reject) => {
+    iterate(dir, (err, results) => {
+      if (err && !results) {
+        reject(err);
+      } else if (
+        results.length === 0 ||
+        iconList.length === 0 ||
+        (iconList.length === 1 && iconList[0] === '*')
+      ) {
+        resolve(results);
+      } else {
+        const newResults = results.filter(icon => {
+          return iconList.indexOf(icon.name) > -1;
+        });
+        resolve(newResults);
+      }
+    });
+  });
 }

@@ -6,7 +6,7 @@
   "scripts": {
     "ico-test": "ico",
     "test": "jest",
-    "test-watch": "jest --watchAll"
+    "watch-tests": "jest --watchAll"
   },
   "repository": {
     "type": "git",
@@ -25,10 +25,12 @@
     "cheerio": "^0.22.0",
     "colors": "^1.1.2",
     "commander": "^2.9.0",
-    "htmlclean": "^3.0.2"
+    "htmlclean": "^3.0.2",
+    "svgo": "^1.0.5"
   },
   "devDependencies": {
     "font-awesome-pro": "github:FortAwesome/Font-Awesome-Pro",
-    "jest": "^23.5.0"
+    "jest": "^23.5.0",
+    "mock-fs": "^4.6.0"
   }
 }
