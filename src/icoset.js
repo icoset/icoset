@@ -1,85 +1,56 @@
-#!/usr/bin/env node
-const path = require('path');
-const readline = require('readline');
-const program = require('commander');
-require('colors');
-
-const getConfig = require('./get-config');
-const constructData = require('./construct-data');
+const { isFunction } = require('./utils');
 const buildIcons = require('./build-icons');
-const buildFile = require('./build-file');
-let defaultOutputName = 'icon-symbols.js';
+const walk = require('./walk');
+const { svgoDefaultConfig } = require('./utils');
 
-program
-  .description(`Command line tool for quickly building icon sets`)
-  .option(`-C, --config [config]`, `Point to the config file. Defaults to "icoset.config.js" for zero-config.`)
-  .option(`-S, --svgPath [svgPath]`, `Point to the svg folder. Only for zero-config setup.`)
-  .option(`-O, --outputPath [outputPath]`, `Set output path. Defaults to the config location.`)
-  .option(`-N, --outputName [outputName]`, `Set output name. Defaults to "${defaultOutputName}".`)
-  .option(`-P, --preserveFolderNames [preserveFolderNames]`, `Preserve folder names in the icon names (/folder/icon.svg becomes 'folder-icon.svg'. Default is false.`)
-  .option(`-M, --viewBoxMap [viewBoxMap]`, `Generate map of all the icon viewBox's. Useful when working with the "use" tag.`)
-  .parse(process.argv);
+// if deepFind is true, then there's a possibility that we could find duplicates.
+// †he default filename will handle this by adding the [N]th index at the end of the filename.
+// if [N] is removed (eg: `[name].[ext]`) then duplicates will override the previously set item.
+// Any overrides will trigger a warning.
 
-// start read line
-const rl = readline.createInterface({
-  input: process.stdin,
-  output: process.stdout
-});
+// Either "directory" or "preset" is required.
+// If both are specified, "directory" will be used and a warning will be triggered.
 
-// print next line
-const nextLine = (line) => {
-  readline.clearLine(process.stdout, 0);
-  readline.cursorTo(process.stdout, 0, null);
-  if (line) {
-    rl.write(line);
-  }
+// any character in "name" that is not wrapped in brackets will be ignored
+// names will be normalized per "nameCase" (both the directory name and svg name)
+
+// this function should output an object with 2 properties: 'svg' and 'viewBoxMap'
+
+const defaultOptions = {
+  directory: null,                  // string - must be an absolute path
+  preset: null,                     // function - must return an absolute path
+  deepFind: false,                  // boolean - check in all sub folders for svg files
+  name: '[dir][name]',              // string - interpolate the icon names
+  icons: ['*'],                     // array - choose which icons you want from the list
+  svgoPlugins: svgoDefaultConfig,   // object - svgo plugins
+};
+
+function throwError(msg) {
+  throw Error(`[icoset] ${msg}`);
 }
 
-const configPath = program.config
-  ? path.resolve(path.relative(process.cwd(), program.config))
-  : false;
-const svgPath = program.svgPath
-  ? path.resolve(path.relative(process.cwd(), program.svgPath))
-  : false;
-const outputPath = program.outputPath
-  ? path.resolve(path.relative(process.cwd(), program.outputPath))
-  : false;
-const outputName = program.outputName || false;
-const preserveFolderNames = !!program.preserveFolderNames;
-const viewBoxMap = !!program.viewBoxMap;
+module.exports = function (options = {}) {
+  return new Promise((resolve) => {
+    const opts = { ...defaultOptions, ...options };
 
-rl.write('Getting Config...');
+    if (typeof opts.directory !== 'string' && isFunction(opts.preset) && typeof opts.preset() === 'string') {
+      opts.directory = opts.preset();
+    }
 
-// run!
-getConfig({
-  configPath,
-  svgPath,
-  originalSvgPath: program.svgPath,
-  outputPath,
-  outputName,
-  preserveFolderNames,
-  viewBoxMap,
-  defaultOutputName,
-}).then((data) => {
-  nextLine('Constructing Data...');
-  return constructData(data);
-})
-  .then((data) => {
-    nextLine('Building Icon Sets...');
-    return buildIcons(data);
-  })
-  .then((data) => {
-    nextLine('Writing New File...');
-    return buildFile(data);
-  })
-  .then((data) => {
-    nextLine();
-    data.consoleMap.forEach(message => console.log(message));
-    console.log('Success!'.bgGreen.black);
-    rl.close();
-  })
-  .catch((err) => {
-    nextLine();
-    console.log(`[IcoSet Error] ${err.stack}`.red);
-    rl.close();
+    // validate options
+    if (!opts.directory && !opts.preset) throwError('Either "options.directory" or "options.preset" must be specified.');
+    if (!opts.directory && opts.preset && (!isFunction(opts.preset) || typeof opts.preset() !== 'string')) throwError(`"options.preset" must be a valid icon preset.`);
+    if (!opts.preset && opts.directory && typeof opts.directory !== 'string') throwError(`"options.directory" requires a string.`);
+    if (typeof opts.deepFind !== 'boolean') throwError(`"options.deepFind" requires a boolean.`);
+    if (typeof opts.name !== 'string') throwError(`"options.name" requires a string.`);
+    if (!Array.isArray(opts.icons)) throwError(`"options.icons" requires an array.`);
+    if (opts.svgoPlugins !== Object(opts.svgoPlugins)) throwError(`"options.svgoPlugins" requires an object.`);
+
+    walk(opts)
+      .then(results => buildIcons(results, opts))
+      .then(results => resolve(results))
+      .catch(err => {
+        throw Error(err);
+      });
   });
+};
