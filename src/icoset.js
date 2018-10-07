@@ -25,7 +25,7 @@ const defaultOptions = {
   svgoPlugins: svgoDefaultConfig,   // object - svgo plugins
 };
 
-function throwError(msg) {
+function throwErr(msg) {
   throw Error(`[icoset] ${msg}`);
 }
 
@@ -38,13 +38,13 @@ module.exports = function (options = {}) {
     }
 
     // validate options
-    if (!opts.directory && !opts.preset) throwError('Either "options.directory" or "options.preset" must be specified.');
-    if (!opts.directory && opts.preset && (!isFunction(opts.preset) || typeof opts.preset() !== 'string')) throwError(`"options.preset" must be a valid icon preset.`);
-    if (!opts.preset && opts.directory && typeof opts.directory !== 'string') throwError(`"options.directory" requires a string.`);
-    if (typeof opts.deepFind !== 'boolean') throwError(`"options.deepFind" requires a boolean.`);
-    if (typeof opts.name !== 'string') throwError(`"options.name" requires a string.`);
-    if (!Array.isArray(opts.icons)) throwError(`"options.icons" requires an array.`);
-    if (opts.svgoPlugins !== Object(opts.svgoPlugins)) throwError(`"options.svgoPlugins" requires an object.`);
+    if (!opts.directory && !opts.preset) throwErr('Either "options.directory" or "options.preset" must be specified.');
+    if (!opts.directory && opts.preset && (!isFunction(opts.preset) || typeof opts.preset() !== 'string')) throwErr(`"options.preset" must be a valid icon preset.`);
+    if (!opts.preset && opts.directory && typeof opts.directory !== 'string') throwErr(`"options.directory" requires a string.`);
+    if (typeof opts.deepFind !== 'boolean') throwErr(`"options.deepFind" requires a boolean.`);
+    if (typeof opts.name !== 'string') throwErr(`"options.name" requires a string.`);
+    if (!Array.isArray(opts.icons)) throwErr(`"options.icons" requires an array.`);
+    if (opts.svgoPlugins !== Object(opts.svgoPlugins)) throwErr(`"options.svgoPlugins" requires an object.`);
 
     walk(opts)
       .then(results => buildIcons(results, opts))
