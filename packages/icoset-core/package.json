@@ -1,0 +1,33 @@
+{
+  "name": "@icoset/icoset",
+  "version": "0.4.1",
+  "description": "Easily compose icon svg's for your apps.",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest",
+    "watch-tests": "jest --watchAll"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:icoset/icoset.git"
+  },
+  "author": "@geoctrl",
+  "license": "MIT",
+  "bin": {
+    "icoset": "index.js"
+  },
+  "bugs": {
+    "url": "https://github.com/icoset/icoset/issues"
+  },
+  "homepage": "https://github.com/icoset/icoset#readme",
+  "dependencies": {
+    "svgo": "^1.0.5"
+  },
+  "devDependencies": {
+    "jest": "^23.5.0",
+    "lerna": "^3.4.1"
+  }
+}
