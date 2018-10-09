@@ -7,15 +7,27 @@ const isSvg = (svg) => {
   return svg.slice(svg.lastIndexOf('.')) === '.svg';
 };
 
+const buildIconObj = results => results.map(item => ({
+  path: item.path,
+  name: item.name,
+}));
+
 /**
  * Walk
  * Take a stroll through all files/sub-folders to find svgs
  */
-module.exports = function walk({ directory, deepFind = false, name = '[name]', icons = ['*'] } = {}) {
+module.exports = function walk(
+  {
+    directory,
+    deepFind = false,
+    namePrependDirectory = false,
+    namePrependCustom = '',
+    icons = [],
+  } = {}) {
   function buildIconObj(icon) {
     if (typeof icon === 'object') return icon;
     const relativeIconPath = icon.replace(RegExp(directory, 'g'), '');
-    const { newName, originalName } = buildName(relativeIconPath, name);
+    const { newName, originalName } = buildName(relativeIconPath, namePrependDirectory, namePrependCustom);
     return {
       path: icon,
       name: newName,
@@ -49,20 +61,16 @@ module.exports = function walk({ directory, deepFind = false, name = '[name]', i
   }
 
   function buildResults(results, resolve) {
-    if (results.length === 0 || icons.length === 0 || (icons.length === 1 && icons[0] === '*')) {
-      resolve(results.map(item => ({
-        path: item.path,
-        name: item.name,
-      })));
-    } else {
-      const newResults = results.filter(newIcon => {
+    const returnResults = icons.length && results.length
+      ? results.filter(newIcon => {
         return icons.find(icon => icon === newIcon.originalName);
-      });
-      resolve(newResults.map(item => ({
-        path: item.path,
-        name: item.name,
-      })));
-    }
+      })
+      : results;
+
+    resolve(returnResults.map(item => ({
+      path: item.path,
+      name: item.name,
+    })));
   }
 
   return new Promise((resolve) => {
