@@ -1,13 +1,13 @@
-# Icoset devicon Preset
+# Icoset Simple Icons Preset
 
 ## Install
 
 ```bash
 # yarn
-$ yarn add @icoset/icoset @icoset/preset-devicon
+$ yarn add @icoset/icoset @icoset/preset-simple-icons
 
 # npm
-$ npm install -S @icoset/icoset @icoset/preset-devicon
+$ npm install -S @icoset/icoset @icoset/preset-simple-icons
 ```
 
 ## Use
@@ -19,7 +19,7 @@ When building your icon set, use the `preset` option instead of
 const icoset = require('@icoset/icoset');
 
 icoset({
-  preset: require('@icoset/preset-devicon'),
+  preset: require('@icoset/preset-simple-icons'),
   // any other options you want
 }).then(res => console.log(res));
 ```

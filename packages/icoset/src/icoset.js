@@ -47,9 +47,10 @@ module.exports = function (options = []) {
       const preset = {};
       if (typeof opt.directory !== 'string' && isFunction(opt.preset) && typeof opt.preset() === 'object') {
         const p = opt.preset();
-        if (p.directory)            preset.directory = p.directory;
-        if (p.namePrependDirectory) preset.namePrependDirectory = p.namePrependDirectory;
-        if (p.nameRemovePattern)    preset.nameRemovePattern = p.nameRemovePattern;
+        if (p.directory) preset.directory = p.directory;
+        if (typeof p.deepFind === 'boolean') preset.deepFind = p.deepFind;
+        if (typeof p.namePrependDirectory === 'boolean') preset.namePrependDirectory = p.namePrependDirectory;
+        if (p.nameRemovePattern) preset.nameRemovePattern = p.nameRemovePattern;
       }
       const option = {
         ...defaultOptions,

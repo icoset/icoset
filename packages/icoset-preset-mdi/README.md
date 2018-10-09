@@ -1,6 +1,4 @@
-# Icoset Material Design Preset
-
-Use Material Design icons in your app using the `@icoset/icoset` module.
+# Icoset MDI (material design icons) Preset
 
 ## Install
 
@@ -22,5 +20,6 @@ const icoset = require('@icoset/icoset');
 
 icoset({
   preset: require('@icoset/preset-mdi'),
+  // any other options you want
 }).then(res => console.log(res));
 ```

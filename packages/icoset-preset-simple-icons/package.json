@@ -1,0 +1,14 @@
+{
+  "name": "@icoset/preset-simple-icons",
+  "version": "0.1.0",
+  "main": "index.js",
+  "repository": "https://github.com/icoset/icoset/tree/master/packages/icoset-preset-simple-icons",
+  "publishConfig": {
+    "access": "public"
+  },
+  "author": "@geoctrl",
+  "license": "MIT",
+  "dependencies": {
+    "simple-icons": "^1.9.6"
+  }
+}
