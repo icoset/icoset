@@ -1,0 +1,14 @@
+{
+  "name": "@icoset/preset-devicon",
+  "version": "0.0.1",
+  "main": "index.js",
+  "repository": "https://github.com/icoset/icoset/tree/master/packages/icoset-preset-devicon",
+  "publishConfig": {
+    "access": "public"
+  },
+  "author": "@geoctrl",
+  "license": "MIT",
+  "dependencies": {
+    "devicon-2.2": "^2.2.0"
+  }
+}

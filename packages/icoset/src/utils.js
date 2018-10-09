@@ -2,32 +2,31 @@ function isFunction(obj) {
   return !!(obj && obj.constructor && obj.call && obj.apply);
 }
 
-function buildName(fullPath, optionName = '[name]') {
-  const nameOptions = optionName
-    .match(/\[(.*?)]/g)
-    .map(opt => opt
-      .replace(/[[\]]/g, '')
-    )
+function getAttrVal(str, attr) {
+  const newStr = str.match(RegExp(`${attr}="([^"]*)"`))[0];
+  return newStr ? newStr.match(/"(.*?)"/g)[0].slice(1).slice(0, -1) : '';
+}
+
+function buildName(fullPath, namePrependDirectory = false, namePrependCustom = '', nameRemovePattern = '') {
   const name = fullPath
     .slice(fullPath.lastIndexOf('/') + 1)
     .replace(/\.svg/, '')
     .replace(/\s+/, '-')
     .replace(/[\-/._]/g, '-');
 
-  const dir = fullPath
+  const directory = fullPath
     .slice(1, fullPath.lastIndexOf('/'))
     .replace(/\s+/, '-')
     .replace(/[\-/_]/g, '-');
 
-  let newName = nameOptions.map(option => {
-    switch (option) {
-      case 'dir':
-        return dir;
-      case 'name':
-        return name;
-    }
-    return '';
-  }).filter(option => option).join('-');
+  let newName = name;
+  if (nameRemovePattern) {
+    const pattern = new RegExp(nameRemovePattern, 'g');
+    newName = newName.replace(pattern, '');
+    if (!newName) newName = name;
+  }
+  if (namePrependDirectory) newName = `${directory}-${newName}`;
+  if (namePrependCustom) newName = `${namePrependCustom}-${newName}`;
 
   return {
     newName,
@@ -60,11 +59,12 @@ const svgoDefaultConfig = {
   removeTitle: true,
   removeDesc: true,
   removeDimensions: true,
-  removeAttrs: { attrs: '(id|class|style)' },
+  removeAttrs: { attrs: '(id|class|style|fill)' },
 };
 
 module.exports = {
   isFunction,
+  getAttrVal,
   buildName,
   svgoDefaultConfig,
 };

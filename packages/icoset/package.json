@@ -10,10 +10,7 @@
   "publishConfig": {
     "access": "public"
   },
-  "repository": {
-    "type": "git",
-    "url": "git@github.com:icoset/icoset.git"
-  },
+  "repository": "https://github.com/icoset/icoset/tree/master/packages/icoset",
   "author": "@geoctrl",
   "license": "MIT",
   "bin": {
