@@ -75,7 +75,6 @@ module.exports = function walk(
   function buildResults(results, resolve) {
     const returnResults = icons.length && results.length
       ? results.filter(newIcon => {
-        console.log(newIcon.originalName);
         return icons.find(icon => icon === newIcon.originalName);
       })
       : results;
