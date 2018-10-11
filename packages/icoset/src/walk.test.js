@@ -32,23 +32,15 @@ describe('walk', () => {
       directory: path.resolve('./', 'svgs'),
       deepFind: true,
       icons: ['wine-glass'],
-      name: '[name]',
     });
     expect(result[0].name).toEqual('wine-glass');
     result = await walk({
       directory: path.resolve('./', 'svgs'),
       deepFind: true,
       icons: ['wine-glass'],
-      name: '[dir][name]',
+      namePrependDirectory: true,
     });
     expect(result[0].name).toEqual('light-fancy-wine-glass');
-    result = await walk({
-      directory: path.resolve('./', 'svgs'),
-      deepFind: true,
-      icons: ['wine-glass'],
-      name: '[name][dir]',
-    });
-    expect(result[0].name).toEqual('wine-glass-light-fancy');
   });
 
 });

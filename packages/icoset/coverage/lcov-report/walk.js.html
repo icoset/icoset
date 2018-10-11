@@ -1,0 +1,368 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Code coverage report for walk.js</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="prettify.css" />
+    <link rel="stylesheet" href="base.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+<body>
+<div class='wrapper'>
+  <div class='pad1'>
+    <h1>
+      <a href="index.html">All files</a> walk.js
+    </h1>
+    <div class='clearfix'>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">83.05% </span>
+        <span class="quiet">Statements</span>
+        <span class='fraction'>49/59</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">76.09% </span>
+        <span class="quiet">Branches</span>
+        <span class='fraction'>35/46</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">100% </span>
+        <span class="quiet">Functions</span>
+        <span class='fraction'>16/16</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">90.91% </span>
+        <span class="quiet">Lines</span>
+        <span class='fraction'>40/44</span>
+      </div>
+    </div>
+  </div>
+  <div class='status-line high'></div>
+<pre><table class="coverage">
+<tr><td class="line-count quiet">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102</td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">259x</span>
+<span class="cline-any cline-yes">224x</span>
+<span class="cline-any cline-yes">224x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">224x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">7x</span>
+<span class="cline-any cline-yes">269x</span>
+<span class="cline-any cline-yes">234x</span>
+<span class="cline-any cline-yes">224x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">224x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">224x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">30x</span>
+<span class="cline-any cline-yes">30x</span>
+<span class="cline-any cline-yes">30x</span>
+<span class="cline-any cline-yes">30x</span>
+<span class="cline-any cline-yes">30x</span>
+<span class="cline-any cline-yes">30x</span>
+<span class="cline-any cline-yes">60x</span>
+<span class="cline-any cline-yes">60x</span>
+<span class="cline-any cline-yes">60x</span>
+<span class="cline-any cline-yes">25x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">25x</span>
+<span class="cline-any cline-yes">25x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">35x</span>
+<span class="cline-any cline-yes">35x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">7x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">18x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">209x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">7x</span>
+<span class="cline-any cline-yes">7x</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">194x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">const fs = require('fs');
+const path = require('path');
+const { buildName } = require('./utils');
+&nbsp;
+/**
+ * Walk
+ * Take a stroll through all files/sub-folders to find svgs
+ */
+module.exports = function walk(
+  {
+    directory,
+    deepFind = false,
+    namePrependDirectory = false,
+    namePrependCustom = '',
+    nameRemovePattern = '',
+    ignorePattern = '',
+    matchPattern = '',
+    icons = [],
+  } = <span class="branch-0 cbranch-no" title="branch not covered" >{})</span> {
+  function buildIconObj(icon) {
+    if (typeof icon === 'object') return icon;
+    const relativeIconPath = icon.replace(RegExp(directory, 'g'), '');
+    const { newName, originalName } = buildName(
+      relativeIconPath,
+      namePrependDirectory,
+      namePrependCustom,
+      nameRemovePattern
+    );
+    return {
+      path: icon,
+      name: newName,
+      originalName,
+    };
+  }
+&nbsp;
+  const isSvg = (svg) =&gt; {
+    if (typeof svg === 'object') return true;
+    if (svg.slice(svg.lastIndexOf('.')) !== '.svg') return false;
+    <span class="missing-if-branch" title="if path not taken" >I</span>if (matchPattern) {
+      const pattern = <span class="cstat-no" title="statement not covered" >new RegExp(matchPattern, 'g');</span>
+<span class="cstat-no" title="statement not covered" >      if (!svg.match(pattern)) <span class="cstat-no" title="statement not covered" >return false;</span></span>
+    }
+    <span class="missing-if-branch" title="if path not taken" >I</span>if (ignorePattern) {
+      const pattern = <span class="cstat-no" title="statement not covered" >new RegExp(ignorePattern, 'g');</span>
+<span class="cstat-no" title="statement not covered" >      if (svg.match(pattern)) <span class="cstat-no" title="statement not covered" >return false;</span></span>
+    }
+    return true;
+  };
+&nbsp;
+  function iterate(dir, done) {
+    let results = [];
+    fs.readdir(dir, function(err, list) {
+      <span class="missing-if-branch" title="if path not taken" >I</span>if (err) <span class="cstat-no" title="statement not covered" >return done(err);</span>
+      let pending = list.length;
+      <span class="missing-if-branch" title="if path not taken" >I</span>if (!pending) <span class="cstat-no" title="statement not covered" >return done(null, results);</span>
+      list.forEach(function(file) {
+        file = path.resolve(dir, file);
+        fs.stat(file, function(err, stat) {
+          if (stat &amp;&amp; stat.isDirectory()) {
+            iterate(file, function(err, res) {
+              // could be a file or a directory
+              results = results.concat(res.filter(isSvg).map(buildIconObj));
+              if (!--pending) done(err, results);
+            });
+          } else {
+            // is a file
+            if (isSvg(file)) results.push(buildIconObj(file));
+            if (!--pending) done(err, results);
+          }
+        });
+      });
+    });
+  }
+&nbsp;
+  function buildResults(results, resolve) {
+    const returnResults = icons.length &amp;&amp; results.length
+      ? results.filter(newIcon =&gt; {
+        return icons.find(icon =&gt; icon === newIcon.originalName);
+      })
+      : results;
+&nbsp;
+    resolve(returnResults.map(item =&gt; ({
+      path: item.path,
+      name: item.name,
+    })));
+  }
+&nbsp;
+  return new Promise((resolve) =&gt; {
+    if (deepFind) {
+      iterate(directory, (err, results) =&gt; {
+        <span class="missing-if-branch" title="if path not taken" >I</span>if (err) <span class="cstat-no" title="statement not covered" >throw Error(err);</span>
+        buildResults(results, resolve);
+      });
+    } else {
+      fs.readdir(directory, function(err, list) {
+        <span class="missing-if-branch" title="if path not taken" >I</span>if (err) <span class="cstat-no" title="statement not covered" >throw Error(err);</span>
+        const results = list.filter(isSvg).map(icon =&gt; buildIconObj(`${directory}/${icon}`));
+        buildResults(results, resolve);
+      });
+    }
+  });
+}</pre></td></tr>
+</table></pre>
+<div class='push'></div><!-- for sticky footer -->
+</div><!-- /wrapper -->
+<div class='footer quiet pad2 space-top1 center small'>
+  Code coverage
+  generated by <a href="https://istanbul.js.org/" target="_blank">istanbul</a> at Wed Oct 10 2018 23:36:32 GMT-0600 (MDT)
+</div>
+</div>
+<script src="prettify.js"></script>
+<script>
+window.onload = function () {
+        if (typeof prettyPrint === 'function') {
+            prettyPrint();
+        }
+};
+</script>
+<script src="sorter.js"></script>
+</body>
+</html>

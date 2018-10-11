@@ -22,8 +22,7 @@ function buildName(fullPath, namePrependDirectory = false, namePrependCustom = '
   let newName = name;
   if (nameRemovePattern) {
     const pattern = new RegExp(nameRemovePattern, 'g');
-    newName = newName.replace(pattern, '');
-    if (!newName) newName = name;
+    newName = newName.replace(pattern, '') || name;
   }
   if (namePrependDirectory) newName = `${directory}-${newName}`;
   if (namePrependCustom) newName = `${namePrependCustom}-${newName}`;

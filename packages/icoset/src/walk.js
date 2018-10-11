@@ -2,16 +2,6 @@ const fs = require('fs');
 const path = require('path');
 const { buildName } = require('./utils');
 
-const isSvg = (svg) => {
-  if (typeof svg === 'object') return true;
-  return svg.slice(svg.lastIndexOf('.')) === '.svg';
-};
-
-const buildIconObj = results => results.map(item => ({
-  path: item.path,
-  name: item.name,
-}));
-
 /**
  * Walk
  * Take a stroll through all files/sub-folders to find svgs
@@ -22,18 +12,40 @@ module.exports = function walk(
     deepFind = false,
     namePrependDirectory = false,
     namePrependCustom = '',
+    nameRemovePattern = '',
+    ignorePattern = '',
+    matchPattern = '',
     icons = [],
   } = {}) {
   function buildIconObj(icon) {
     if (typeof icon === 'object') return icon;
     const relativeIconPath = icon.replace(RegExp(directory, 'g'), '');
-    const { newName, originalName } = buildName(relativeIconPath, namePrependDirectory, namePrependCustom);
+    const { newName, originalName } = buildName(
+      relativeIconPath,
+      namePrependDirectory,
+      namePrependCustom,
+      nameRemovePattern
+    );
     return {
       path: icon,
       name: newName,
       originalName,
     };
   }
+
+  const isSvg = (svg) => {
+    if (typeof svg === 'object') return true;
+    if (svg.slice(svg.lastIndexOf('.')) !== '.svg') return false;
+    if (matchPattern) {
+      const pattern = new RegExp(matchPattern, 'g');
+      if (!svg.match(pattern)) return false;
+    }
+    if (ignorePattern) {
+      const pattern = new RegExp(ignorePattern, 'g');
+      if (svg.match(pattern)) return false;
+    }
+    return true;
+  };
 
   function iterate(dir, done) {
     let results = [];
@@ -63,6 +75,7 @@ module.exports = function walk(
   function buildResults(results, resolve) {
     const returnResults = icons.length && results.length
       ? results.filter(newIcon => {
+        console.log(newIcon.originalName);
         return icons.find(icon => icon === newIcon.originalName);
       })
       : results;
