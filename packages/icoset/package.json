@@ -1,6 +1,6 @@
 {
   "name": "@icoset/icoset",
-  "version": "0.4.6",
+  "version": "0.4.7",
   "description": "Easily compose icon svg's for your apps.",
   "main": "index.js",
   "scripts": {
