@@ -2,7 +2,7 @@
   "name": "@icoset/preset-simple-icons",
   "version": "0.1.3",
   "main": "index.js",
-  "repository": "https://github.com/icoset/icoset/tree/master/packages/icoset-preset-simple-icons",
+  "repository": "https://github.com/icoset/icoset/tree/master/packages/preset-simple-icons",
   "publishConfig": {
     "access": "public"
   },

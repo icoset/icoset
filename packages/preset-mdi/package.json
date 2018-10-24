@@ -2,7 +2,7 @@
   "name": "@icoset/preset-mdi",
   "version": "0.0.7",
   "main": "index.js",
-  "repository": "https://github.com/icoset/icoset/tree/master/packages/icoset-preset-mdi",
+  "repository": "https://github.com/icoset/icoset/tree/master/packages/preset-mdi",
   "publishConfig": {
     "access": "public"
   },
