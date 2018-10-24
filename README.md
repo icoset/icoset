@@ -9,6 +9,7 @@ The Core module:
 
 Presets:
 
-- [@icoset/preset-devicon](https://github.com/icoset/icoset/tree/master/packages/icoset-preset-devicon)
-- [@icoset/preset-mdi](https://github.com/icoset/icoset/tree/master/packages/icoset-preset-mdi)
-- [@icoset/preset-simple-icons](https://github.com/icoset/icoset/tree/master/packages/icoset-preset-simple-icons)
+- [@icoset/preset-devicon](https://github.com/icoset/icoset/tree/master/packages/preset-devicon)
+- [@icoset/preset-mdi](https://github.com/icoset/icoset/tree/master/packages/preset-mdi)
+- [@icoset/preset-simple-icons](https://github.com/icoset/icoset/tree/master/packages/preset-simple-icons)
+- [@icoset/preset-evil-icons](https://github.com/icoset/icoset/tree/master/packages/preset-evil-icons)
