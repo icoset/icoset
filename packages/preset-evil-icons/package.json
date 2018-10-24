@@ -2,7 +2,7 @@
   "name": "@icoset/preset-evil-icons",
   "version": "0.1.4",
   "main": "index.js",
-  "repository": "https://github.com/icoset/icoset/tree/master/packages/icoset-preset-evil-icons",
+  "repository": "https://github.com/icoset/icoset/tree/master/packages/preset-evil-icons",
   "publishConfig": {
     "access": "public"
   },
