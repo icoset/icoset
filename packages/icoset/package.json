@@ -21,7 +21,8 @@
   },
   "homepage": "https://github.com/icoset/icoset#readme",
   "dependencies": {
-    "svgo": "^1.1.1"
+    "svgo": "^1.1.1",
+    "merge": "^1.2.1"
   },
   "devDependencies": {
     "jest": "^23.5.0",
