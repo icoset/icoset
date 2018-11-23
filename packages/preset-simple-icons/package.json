@@ -1,6 +1,6 @@
 {
   "name": "@icoset/preset-simple-icons",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "main": "index.js",
   "repository": "https://github.com/icoset/icoset/tree/master/packages/preset-simple-icons",
   "publishConfig": {
