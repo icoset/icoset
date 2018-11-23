@@ -58,11 +58,48 @@ A node module that points to a `node_module` svg repo.
 
 #### icons `array`
 
-By default, icoset will grab all the svg's it can find (default: `['*']`). However,
+By default, icoset will grab all the svg's it can find (default: `icons: []`). However,
 if we have access to a large icon set, we might not want them all. Specifying the
 exact icons we want would greatly reduce output size.
 
-Just specify it in an array: `['address-book', 'heart', 'check']`.
+**String items:**
+
+Just specify file names (excluding the `svg` extension) in the array:
+
+```javascript
+icoset({
+  directory: '...',
+  icons: ['address-book', 'heart', 'check'],
+})
+```
+
+Icoset will automatically find all icons that match (see `deepFind` to see how
+deeply nested svg files work).
+
+**Object items:**
+
+if you have a complicated svg directory, and need more control over what files
+to grab and how to name your icons, you can specify an object for each icon.
+
+The object key is the final name of the icon, and the object value is the
+path to the file.
+
+For example, if you're targeting: `icons/regular/alarm.svg`, you would write
+your config like this:
+
+```javascript
+icoset({
+  directory: path.resolve(__dirname, 'icons'),
+  icons: [
+    { alarm: 'regular/alarm.svg' },
+  ],
+});
+```
+
+**Note:**
+
+The `directory` property is still required - it will serve as the base path
+for each object's value (partial path).
 
 #### deepFind `boolean`
 

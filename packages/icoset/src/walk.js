@@ -72,30 +72,45 @@ module.exports = function walk(
     });
   }
 
-  function buildResults(results, resolve) {
+  function buildResults(results) {
     const returnResults = icons.length && results.length
       ? results.filter(newIcon => {
         return icons.find(icon => icon === newIcon.originalName);
       })
       : results;
 
-    resolve(returnResults.map(item => ({
+    return returnResults.map(item => ({
       path: item.path,
       name: item.name,
-    })));
+    })).concat(icons
+      .map(icon => {
+        if (typeof icon === 'object') {
+          const iconName = Object.keys(icon)[0];
+          const iconPath = Object.values(icon)[0];
+          if (fs.existsSync(path.resolve(directory, iconPath))) {
+            return {
+              path: path.resolve(directory, iconPath),
+              name: iconName,
+            };
+          }
+        }
+        return null
+      })
+      .filter(icon => icon)
+    );
   }
 
   return new Promise((resolve) => {
     if (deepFind) {
       iterate(directory, (err, results) => {
         if (err) throw Error(err);
-        buildResults(results, resolve);
+        resolve(buildResults(results));
       });
     } else {
       fs.readdir(directory, function(err, list) {
         if (err) throw Error(err);
         const results = list.filter(isSvg).map(icon => buildIconObj(`${directory}/${icon}`));
-        buildResults(results, resolve);
+        resolve(buildResults(results));
       });
     }
   });

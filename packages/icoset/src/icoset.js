@@ -3,22 +3,6 @@ const buildIcons = require('./build-icons');
 const walk = require('./walk');
 const { svgoDefaultConfig } = require('./utils');
 
-// if deepFind is true, then there's a possibility that we could find duplicates.
-// †he default filename will handle this by adding the "nth" index at the end of the filename
-// (eg: search-2).
-// if "prependDirectory" is true, then a unique name is guaranteed and no "nth" index is needed
-
-// Either "directory" or "preset" is required.
-// If both are specified, "directory" will be used and a warning will be triggered.
-
-// any character in "name" that is not wrapped in brackets will be ignored
-// names will be normalized per "nameCase" (both the directory name and svg name)
-
-// if both "namePrependDirectory" and "namePrependCustom" are used, then the following order is
-// enforced: "[namePrependCustom]-[namePrependDirectory]-[name]"
-
-// this function should output an object with 2 properties: 'svg' and 'viewBoxMap'
-
 const defaultOptions = {
   preset: null,                     // function - must return an object
   icons: [],                        // array - choose which icons you want from the list - empty is ALL icons
