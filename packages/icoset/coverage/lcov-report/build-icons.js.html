@@ -168,7 +168,7 @@ const SVGO = require('svgo');
 const { getAttrVal } = require('./utils');
 &nbsp;
 module.exports = function buildIcons(iconGroups = <span class="branch-0 cbranch-no" title="branch not covered" >[],</span> options = []) {
-  const viewBoxMap = {};
+  const iconMap = {};
   const processIconSet = Promise.all(
     iconGroups.reduce((newList, iconList, listIndex) =&gt; {
       let svgoPlugins = {};
@@ -198,7 +198,7 @@ module.exports = function buildIcons(iconGroups = <span class="branch-0 cbranch-
                   const width = getAttrVal(newFile, 'width');
                   viewBox = width &amp;&amp; height ? `0 0 ${width} ${height}` : <span class="branch-1 cbranch-no" title="branch not covered" >'';</span>
                 }
-                viewBoxMap[icon.name] = { viewBox };
+                iconMap[icon.name] = { viewBox };
                 newFile = newFile
                   .replace(/svg&gt;/g, 'symbol&gt;')
                   .replace(/&lt;svg/g, `&lt;symbol id="${icon.name}"`);
@@ -218,7 +218,7 @@ module.exports = function buildIcons(iconGroups = <span class="branch-0 cbranch-
     processIconSet.then((icons) =&gt; {
       resolve({
         svg: `&lt;svg xmlns="http://www.w3.org/2000/svg" style="display: none;"&gt;${icons.join('')}&lt;/svg&gt;`,
-        viewBoxMap,
+        iconMap,
       });
     });
   });

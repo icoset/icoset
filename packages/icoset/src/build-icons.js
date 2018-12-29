@@ -3,7 +3,7 @@ const SVGO = require('svgo');
 const { getAttrVal } = require('./utils');
 
 module.exports = function buildIcons(iconGroups = [], options = []) {
-  const viewBoxMap = {};
+  const iconMap = {};
   const processIconSet = Promise.all(
     iconGroups.reduce((newList, iconList, listIndex) => {
       let svgoPlugins = {};
@@ -33,7 +33,7 @@ module.exports = function buildIcons(iconGroups = [], options = []) {
                   const width = getAttrVal(newFile, 'width');
                   viewBox = width && height ? `0 0 ${width} ${height}` : '';
                 }
-                viewBoxMap[icon.name] = { viewBox };
+                iconMap[icon.name] = { viewBox };
                 newFile = newFile
                   .replace(/svg>/g, 'symbol>')
                   .replace(/<svg/g, `<symbol id="${icon.name}"`);
@@ -53,7 +53,7 @@ module.exports = function buildIcons(iconGroups = [], options = []) {
     processIconSet.then((icons) => {
       resolve({
         svg: `<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">${icons.join('')}</svg>`,
-        viewBoxMap,
+        iconMap,
       });
     });
   });

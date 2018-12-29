@@ -33,7 +33,7 @@ Outputs:
 ```json
 {
   "svg": "<svg xmls=\"...\"><symbol id=\"heart\"></symbol>...</svg>",
-  "viewBoxMap": { "heart": { "viewBox": "0 0 24 24" } },
+  "iconMap": { "heart": { "viewBox": "0 0 24 24" } },
 }
 ```
 
