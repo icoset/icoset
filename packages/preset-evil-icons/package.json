@@ -1,6 +1,6 @@
 {
   "name": "@icoset/preset-evil-icons",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "main": "index.js",
   "repository": "https://github.com/icoset/icoset/tree/master/packages/preset-evil-icons",
   "publishConfig": {
