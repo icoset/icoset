@@ -18,7 +18,7 @@ describe('walk', () => {
     const result = await walk({ directory: path.resolve('icons'), deepFind: true });
     expect(Object.keys(result[0])).toEqual(['path', 'name']);
     const svg = result.find(icon => icon.name === 'emoticon-tongue');
-    expect(svg.path).toEqual(`${path.resolve('icons/light')}/${svg.name}.svg`);
+    expect(svg.path).toEqual(path.resolve('icons/light', `${svg.name}.svg`));
   });
 
   test('"options.icons" should limit results', async () => {

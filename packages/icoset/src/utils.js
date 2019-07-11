@@ -1,3 +1,5 @@
+const path = require('path');
+
 function isFunction(obj) {
   return !!(obj && obj.constructor && obj.call && obj.apply);
 }
@@ -8,16 +10,13 @@ function getAttrVal(str, attr) {
 }
 
 function buildName(fullPath, namePrependDirectory = false, namePrependCustom = '', nameRemovePattern = '') {
-  const name = fullPath
-    .slice(fullPath.lastIndexOf('/') + 1)
-    .replace(/\.svg/, '')
-    .replace(/\s+/, '-')
-    .replace(/[\-/._]/g, '-');
+  const name = path.parse(fullPath).name
+    .replace(/\s+/, '-');
 
-  const directory = fullPath
-    .slice(1, fullPath.lastIndexOf('/'))
-    .replace(/\s+/, '-')
-    .replace(/[\-/_]/g, '-');
+  const directory = path.parse(fullPath).dir
+    .split(path.sep)
+    .filter(name => name)
+    .join('-');
 
   let newName = name;
   if (nameRemovePattern) {
