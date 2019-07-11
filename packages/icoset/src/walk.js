@@ -19,7 +19,7 @@ module.exports = function walk(
   } = {}) {
   function buildIconObj(icon) {
     if (typeof icon === 'object') return icon;
-    const relativeIconPath = icon.replace(RegExp(directory, 'g'), '');
+    const relativeIconPath = icon.slice(directory.length);
     const { newName, originalName } = buildName(
       relativeIconPath,
       namePrependDirectory,
