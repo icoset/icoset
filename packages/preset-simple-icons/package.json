@@ -9,6 +9,6 @@
   "author": "@geoctrl",
   "license": "MIT",
   "dependencies": {
-    "simple-icons": "^1.9.6"
+    "simple-icons": "^1.10.0"
   }
 }
