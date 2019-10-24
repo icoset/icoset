@@ -9,6 +9,6 @@
   "author": "@geoctrl",
   "license": "MIT",
   "dependencies": {
-    "feather-icons": "^4.22.1"
+    "feather-icons": "^4.24.1"
   }
 }

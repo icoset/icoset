@@ -9,6 +9,6 @@
   "author": "@geoctrl",
   "license": "MIT",
   "dependencies": {
-    "@mdi/svg": "^3.7.95"
+    "@mdi/svg": "^4.5.95"
   }
 }
