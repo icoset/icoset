@@ -1,49 +1,37 @@
 const fs = require('fs');
-const SVGO = require('svgo');
-const { getAttrVal } = require('./utils');
+const { optimize } = require('svgo');
 
 module.exports = function buildIcons(iconGroups = [], options = []) {
-  const iconMap = {};
   const processIconSet = Promise.all(
     iconGroups.reduce((newList, iconList, listIndex) => {
-      let svgoPlugins = {};
-      if (options[listIndex] && options[listIndex].svgoPlugins) svgoPlugins = options[listIndex].svgoPlugins;
+      let svgoConfig = options[listIndex] && options[listIndex].svgoConfig;
       return newList.concat(iconList.map(icon => {
         return new Promise((resolveSvgo) => {
           let file;
           try {
             file = fs.readFileSync(icon.path, 'utf8');
           } catch (e) {
-            throw Error(e);
+            console.warn(`[icoset] Unable to read svg at path: "${icon.path}"`);
+            console.warn('[icoset] skipped file');
+            resolveSvgo('');
           }
-          file = file.replace(/viewbox/, 'viewBox');
-          const opts = {
-            plugins: Object.keys(svgoPlugins)
-              .map(key => ({ [key]: svgoPlugins[key] }))
-          };
-          const svgo = new SVGO(opts);
-          svgo.optimize(file)
-            .then(optimizedFile => {
-                let newFile = optimizedFile.data;
-                let viewBox = '';
-                if (newFile.includes('viewBox')) {
-                  viewBox = getAttrVal(newFile, 'viewBox');
-                } else if (newFile.includes('width') && newFile.includes('height')) {
-                  const height = getAttrVal(newFile, 'height');
-                  const width = getAttrVal(newFile, 'width');
-                  viewBox = width && height ? `0 0 ${width} ${height}` : '';
-                }
-                iconMap[icon.name] = { viewBox };
-                newFile = newFile
-                  .replace(/svg>/g, 'symbol>')
-                  .replace(/<svg/g, `<symbol id="${icon.name}"`);
-                resolveSvgo(newFile);
-              },
-              (err) => {
-                console.warn(`[icoset] Unable to parse svg: "${icon.path}"`);
-                console.warn('[icoset] skipped file');
-                resolveSvgo('');
-              });
+          // bypass svgo rule for ignoring comments
+          file = file.replace('<!--!', '<!--');
+          try {
+            const result = optimize(file, svgoConfig || {
+              plugins: ['preset-default'],
+            });
+            let newFile = result.data;
+            newFile = newFile
+              .replace(/svg>/g, 'symbol>')
+              .replace(/<svg/g, `<symbol id="${icon.name}"`);
+            resolveSvgo(newFile);
+          } catch (e) {
+            console.warn(`[icoset] Unable to parse svg: "${icon.path}"`);
+            console.warn('[icoset] skipped file');
+            console.warn(e);
+            resolveSvgo('');
+          }
         });
       }));
     }, [])
@@ -51,11 +39,7 @@ module.exports = function buildIcons(iconGroups = [], options = []) {
 
   return new Promise((resolve) => {
     processIconSet.then((icons) => {
-      resolve({
-        svg: `<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">${icons.join('')}</svg>`,
-        iconMap,
-      });
+      resolve(`<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">${icons.join('')}</svg>`);
     });
   });
-
 }

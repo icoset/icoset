@@ -1,6 +1,6 @@
 {
   "name": "@icoset/icoset",
-  "version": "0.4.12",
+  "version": "1.0.0",
   "description": "Easily compose icon svg's for your apps.",
   "main": "index.js",
   "scripts": {
@@ -21,10 +21,9 @@
   },
   "homepage": "https://github.com/icoset/icoset#readme",
   "dependencies": {
-    "merge": "^1.2.1",
-    "svgo": "^1.2.2"
+    "svgo": "^2.8.0"
   },
   "devDependencies": {
-    "jest": "^24.8.0"
+    "jest": "^27.5.1"
   }
 }

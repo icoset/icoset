@@ -30,33 +30,30 @@ icoset({ directory: path.resolve('./icons') })
 
 Outputs:
 
-```json
-{
-  "svg": "<svg xmls=\"...\"><symbol id=\"heart\"></symbol>...</svg>",
-  "iconMap": { "heart": { "viewBox": "0 0 24 24" } },
-}
+```html
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="heart">...</symbol>
+  ...
+</svg>
 ```
 
-(some icon libraries have varying viewbox sizes, which are required at the top-level
-svg during render).
+## Options
 
-### Options
-
-#### directory `string`
+### directory `string`
 
 The directory where the `.svg`'s are hanging out.
 
 - Required if `preset` is not defined.
 - Must be an absolute path.
 
-#### preset `function`
+### preset `function`
 
 A node module that points to a `node_module` svg repo.
 
 - Required if `directory` is not defined.
 - Function must return valid preset config.
 
-#### icons `array`
+### icons `array`
 
 By default, icoset will grab all the svg's it can find (default: `icons: []`). However,
 if we have access to a large icon set, we might not want them all. Specifying the
@@ -73,8 +70,7 @@ icoset({
 })
 ```
 
-Icoset will automatically find all icons that match (see `deepFind` to see how
-deeply nested svg files work).
+Icoset will automatically find all icons that match.
 
 **Object items:**
 
@@ -101,11 +97,11 @@ icoset({
 The `directory` property is still required - it will serve as the base path
 for each object's value (partial path).
 
-#### deepFind `boolean`
+### deepFind `boolean`
 
 Deeply searches the directory for all `.svg`s. Default is `false`.
 
-#### namePrependDirectory `boolean`
+### namePrependDirectory `boolean`
 
 Prepend the directory structure to the icon name (only works if `deepFind` is `true`).
 
@@ -125,7 +121,7 @@ example of this is font awesome's svg structure (regular, light, etc). Using
 - Not Required.
 - Default is `false`.
 
-#### namePrependCustom `string`
+### namePrependCustom `string`
 
 Add a custom string to the beginning of all the icons names.
 
@@ -142,7 +138,7 @@ then the following is the order that is enforced:
 - Not required
 - Default is `null`
 
-#### nameRemovePattern `string`
+### nameRemovePattern `string`
 
 Remove repetitive fluff from icon names.
 
@@ -161,7 +157,7 @@ icoset({
 - Not required.
 - Default is `null`.
 
-#### ignorePattern `string`
+### ignorePattern `string`
 
 Don't add svg's to output if their name's match this pattern.
 
@@ -175,7 +171,7 @@ icoset({
 - Not required.
 - Default is `null`.
 
-#### matchPattern `string`
+### matchPattern `string`
 
 Only add svg's to output if their name's match this pattern.
 
@@ -189,15 +185,20 @@ icoset({
 - Not required.
 - Default is `null`.
 
-#### svgoPlugins `object`
+### svgoConfig `object`
 
-Icoset uses svgo to clean up the svg's. You can override the defaults here.
+Icoset uses `svgo` to clean up the svg's. This option is a pass-through for the
+svgo [config](https://github.com/svg/svgo#configuration) argument.
+Although svgo already has sensible defaults using `preset-default`, you can
+override anything you'd like here.
 
-**Note:** Svgo uses a plugin system and requires each plugin to have its own
-object inside an array. For this implementation, however, just add each plugin
-as a prop in a single object:
-
+```javascript
+icoset({
+  svgoConfig: {
+    multipass: false,
+    plugins: [
+      'prefixIds',
+    ],
+  },
+});
 ```
-plugins: { cleanupAttrs: true, removeDoctype: true }
-```
-

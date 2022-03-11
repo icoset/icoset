@@ -1,12 +1,11 @@
 const { isFunction } = require('./utils');
 const buildIcons = require('./build-icons');
 const walk = require('./walk');
-const { svgoDefaultConfig } = require('./utils');
 
 const defaultOptions = {
   preset: null,                     // function - must return an object
   icons: [],                        // array - choose which icons you want from the list - empty is ALL icons
-  svgoPlugins: svgoDefaultConfig,   // object - svgo plugins
+  svgoConfig: null,                 // object - svgo plugins
   // presets can override:
   directory: null,                  // string - must be an absolute path
   deepFind: false,                  // boolean - check in all sub folders for svg files
@@ -40,7 +39,7 @@ function mashOptionsAndPreset(options) {
   };
 }
 
-module.exports = function (options = []) {
+module.exports = function (options = [{}]) {
   return new Promise((resolve) => {
     // validate options
     if (!Array.isArray(options) && typeof options !== 'object') throwErr('Argument [options] should be a valid config object or a collection of valid configs.');
@@ -59,7 +58,7 @@ module.exports = function (options = []) {
       if (typeof opt.ignorePattern !== 'string') throwErr(`"options.ignorePattern" must be a string`)
       if (typeof opt.matchPattern !== 'string') throwErr(`"options.matchPattern" must be a string`)
       if (!Array.isArray(opt.icons)) throwErr(`"options.icons" requires an array.`);
-      if (opt.svgoPlugins !== Object(opt.svgoPlugins)) throwErr(`"options.svgoPlugins" requires an object.`);
+      if (opt.svgoConfig && opt.svgoConfig !== Object(opt.svgoConfig)) throwErr(`"options.svgoConfig" requires an object.`);
       return opt;
     });
 
